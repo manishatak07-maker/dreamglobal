@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Account - SANTRA MALL</title>
+  <style>
+    :root{--accent:#e91e63;--bg:#f5f5f5;--card:#fff;--text:#212121}
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+    body{background:var(--bg);color:var(--text);}
+    
+   .header{background:var(--card);padding:15px 20px;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+   .header h1{color:var(--accent);font-size:22px;}
+   .back-btn{color:var(--accent);text-decoration:none;font-weight:bold;}
+    
+   .container{max-width:500px;margin:40px auto;background:var(--card);padding:30px;border-radius:12px;box-shadow:0 5px 25px rgba(0,0,0,0.1);}
+    
+    h2{text-align:center;color:var(--accent);margin-bottom:20px;}
+    input{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:6px;font-size:14px;}
+    button{width:100%;padding:12px;background:var(--accent);color:white;border:none;border-radius:6px;font-weight:bold;margin:8px 0;font-size:15px;cursor:pointer;}
+    button:hover{opacity:0.9;}
+   .btn-gray{background:#999!important;}
+   .btn-green{background:#4caf50!important;}
+   .hide{display:none!important;}
+    
+    /* LEFT SIDE POPUP */
+   .left-popup{position:fixed;left:20px;bottom:20px;background:var(--card);padding:20px;border-radius:10px;box-shadow:0 5px 25px rgba(0,0,0,0.3);width:300px;border-left:4px solid #4caf50;animation:slideLeft 0.3s;z-index:999;}
+   .left-popup h3{color:#4caf50;margin-bottom:10px;font-size:16px;}
+   .left-popup p{margin:6px 0;font-size:14px;color:#666;}
+   .left-popup b{color:var(--text);}
+   .close-left{float:right;cursor:pointer;font-size:20px;color:#999;}
+    
+    @keyframes slideLeft{from{transform:translateX(-100px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html" class="back-btn">← Back to Shop</a>
+</div>
+
+<div class="container">
+  <h2>👤 Customer Account</h2>
+  
+  <!-- STEP 1: OTP LOGIN -->
+  <div id="stepOTP">
+    <p style="color:#999;font-size:13px;margin-bottom:15px;text-align:center;">Enter mobile number to get OTP</p>
+    <input type="tel" id="loginMobile" placeholder="10 Digit Mobile Number" maxlength="10">
+    <button onclick="sendOTP()">Send OTP</button>
+    
+    <div id="otpBox" class="hide" style="margin-top:15px;">
+      <p style="font-size:12px;color:#4caf50;">OTP sent to: <span id="sentMobile"></span></p>
+      <input type="text" id="enterOTP" placeholder="Enter 4 Digit OTP" maxlength="4">
+      <button onclick="verifyOTP()">Verify OTP</button>
+      <button onclick="resendOTP()" class="btn-gray">Resend OTP</button>
+    </div>
+  </div>
+  
+  <!-- STEP 2: PROFILE FORM - OTP Verify Ke Baad -->
+  <div id="stepProfile" class="hide">
+    <h3 style="color:#4caf50;margin-bottom:15px;text-align:center;">✅ Complete Your Profile</h3>
+    <input type="text" id="profileName" placeholder="Full Name *">
+    <input type="tel" id="profileMobile" placeholder="Mobile Number" readonly style="background:#f5f5f5;">
+    <input type="email" id="profileEmail" placeholder="Email Address">
+    <input type="text" id="profileAddress" placeholder="Full Address *">
+    <input type="text" id="profileCity" placeholder="City *">
+    <input type="text" id="profilePincode" placeholder="Pincode *">
+    <button onclick="saveProfile()" class="btn-green">💾 Save Profile</button>
+  </div>
+  
+  <!-- STEP 3: SUCCESS MESSAGE -->
+  <div id="stepSuccess" class="hide">
+    <h3 style="color:#4caf50;text-align:center;">✅ Profile Saved Successfully!</h3>
+    <p style="text-align:center;color:#999;margin:15px 0;">Your details are now visible on left side</p>
+    <button onclick="editProfile()">✏️ Edit Profile</button>
+    <button onclick="customerLogout()" class="btn-gray">Logout</button>
+  </div>
+  
+</div>
+
+<!-- LEFT SIDE POPUP - Save Ke Baad Dikhega -->
+<div id="leftSidePopup" class="left-popup hide">
+  <span class="close-left" onclick="closeLeftPopup()">×</span>
+  <h3>✅ Profile Details</h3>
+  <p><b>Name:</b> <span id="popupName"></span></p>
+  <p><b>Mobile:</b> <span id="popupMobile"></span></p>
+  <p><b>Email:</b> <span id="popupEmail"></span></p>
+  <p><b>City:</b> <span id="popupCity"></span></p>
+  <p><b>Pincode:</b> <span id="popupPincode"></span></p>
+</div>
+
+<script>
+var GENERATED_OTP = '';
+var TEMP_MOBILE = '';
+
+// PAGE LOAD PE CHECK KAR
+window.addEventListener('load', function(){
+  var savedProfile = JSON.parse(localStorage.getItem('customerProfile')||'null');
+  if(savedProfile){
+    // Already logged in - seedha success page dikha
+    document.getElementById('stepOTP').classList.add('hide');
+    document.getElementById('stepProfile').classList.add('hide');
+    document.getElementById('stepSuccess').classList.remove('hide');
+    showLeftPopup(savedProfile);
+  }
+});
+
+// SEND OTP
+function sendOTP(){
+  var mobile = document.getElementById('loginMobile').value.trim();
+  if(mobile.length!== 10 ||!/^[6-9]\d{9}$/.test(mobile)){
+    alert('Invalid mobile number! Should be 10 digits starting with 6-9');
+    return;
+  }
+  
+  GENERATED_OTP = Math.floor(1000 + Math.random() * 9000).toString();
+  TEMP_MOBILE = mobile;
+  
+  // DEMO: Alert me OTP dikha rahe - Real me SMS aayega
+  alert('Demo OTP: ' + GENERATED_OTP);
+  
+  document.getElementById('sentMobile').innerText = mobile;
+  document.getElementById('otpBox').classList.remove('hide');
+}
+
+// VERIFY OTP
+function verifyOTP(){
+  var enteredOTP = document.getElementById('enterOTP').value.trim();
+  
+  if(enteredOTP === GENERATED_OTP){
+    // OTP Sahi - Profile Form Dikha
+    document.getElementById('stepOTP').classList.add('hide');
+    document.getElementById('stepProfile').classList.remove('hide');
+    document.getElementById('profileMobile').value = TEMP_MOBILE;
+    
+    // Agar pehle se profile hai to load kar de
+    var users = JSON.parse(localStorage.getItem('santraUsers')||'[]');
+    var existingUser = users.find(u => u.mobile === TEMP_MOBILE);
+    if(existingUser){
+      document.getElementById('profileName').value = existingUser.name || '';
+      document.getElementById('profileEmail').value = existingUser.email || '';
+      document.getElementById('profileAddress').value = existingUser.address || '';
+      document.getElementById('profileCity').value = existingUser.city || '';
+      document.getElementById('profilePincode').value = existingUser.pincode || '';
+    }
+    
+  }else{
+    alert('Wrong OTP! Please try again.');
+    document.getElementById('enterOTP').value = '';
+  }
+}
+
+function resendOTP(){
+  GENERATED_OTP = Math.floor(1000 + Math.random() * 9000).toString();
+  alert('New OTP: ' + GENERATED_OTP);
+  document.getElementById('enterOTP').value = '';
+}
+
+// SAVE PROFILE
+function saveProfile(){
+  var name = document.getElementById('profileName').value.trim();
+  var mobile = document.getElementById('profileMobile').value.trim();
+  var email = document.getElementById('profileEmail').value.trim();
+  var address = document.getElementById('profileAddress').value.trim();
+  var city = document.getElementById('profileCity').value.trim();
+  var pincode = document.getElementById('profilePincode').value.trim();
+  
+  if(!name ||!address ||!city ||!pincode){
+    alert('Please fill all * marked fields!');
+    return;
+  }
+  
+  var profileData = {
+    id: Date.now(),
+    name: name,
+    mobile: mobile,
+    email: email,
+    address: address,
+    city: city,
+    pincode: pincode,
+    joined: new Date().toLocaleDateString()
+  };
+  
+  // Save in localStorage
+  localStorage.setItem('customerProfile', JSON.stringify(profileData));
+  
+  // Update santraUsers list
+  var users = JSON.parse(localStorage.getItem('santraUsers')||'[]');
+  var existingIndex = users.findIndex(u => u.mobile === mobile);
+  if(existingIndex >= 0){
+    users[existingIndex] = profileData;
+  }else{
+    users.push(profileData);
+  }
+  localStorage.setItem('santraUsers', JSON.stringify(users));
+  
+  // Show Success
+  document.getElementById('stepProfile').classList.add('hide');
+  document.getElementById('stepSuccess').classList.remove('hide');
+  
+  // Show Left Side Popup
+  showLeftPopup(profileData);
+}
+
+// LEFT SIDE POPUP DIKHA
+function showLeftPopup(data){
+  document.getElementById('popupName').innerText = data.name;
+  document.getElementById('popupMobile').innerText = data.mobile;
+  document.getElementById('popupEmail').innerText = data.email || 'Not provided';
+  document.getElementById('popupCity').innerText = data.city;
+  document.getElementById('popupPincode').innerText = data.pincode;
+  document.getElementById('leftSidePopup').classList.remove('hide');
+  
+  // 5 second baad auto hide
+  setTimeout(function(){
+    document.getElementById('leftSidePopup').classList.add('hide');
+  }, 5000);
+}
+
+function closeLeftPopup(){
+  document.getElementById('leftSidePopup').classList.add('hide');
+}
+
+function editProfile(){
+  var savedProfile = JSON.parse(localStorage.getItem('customerProfile')||'null');
+  if(savedProfile){
+    document.getElementById('profileName').value = savedProfile.name;
+    document.getElementById('profileMobile').value = savedProfile.mobile;
+    document.getElementById('profileEmail').value = savedProfile.email || '';
+    document.getElementById('profileAddress').value = savedProfile.address;
+    document.getElementById('profileCity').value = savedProfile.city;
+    document.getElementById('profilePincode').value = savedProfile.pincode;
+  }
+  document.getElementById('stepSuccess').classList.add('hide');
+  document.getElementById('stepProfile').classList.remove('hide');
+}
+
+function customerLogout(){
+  localStorage.removeItem('customerProfile');
+  document.getElementById('leftSidePopup').classList.add('hide');
+  location.reload();
+}
+</script>
+
+</body>
+</html>

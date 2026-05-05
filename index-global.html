@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">Santra Mall - Online Shopping</title>
+<style>
+:root {
+  --heading-color: #212121;
+  --text-color: #424242;
+  --link-color: #e40046;
+  --header-bg: linear-gradient(90deg, #ff9a9e 0%, #fecfef 100%);
+  --footer-bg: linear-gradient(90deg, #fecfef 0%, #ff9a9e 100%);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#fff8f0;color:var(--text-color);}
+h1,h2,h3,h4{color:var(--heading-color);}
+a{color:var(--link-color);}
+button{cursor:pointer;}
+.header{background:var(--header-bg);color:#d32f2f;text-align:center;padding:15px;font-size:36px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;}
+.header h1{font-size:36px;color:#d32f2f;}
+.header-tagline{font-size:12px;color:#d32f2f;font-weight:normal;margin-top:5px;}
+.header-logo{height:40px;display:none;margin-right:10px;}
+.cart-icon{background:white;color:#d32f2f;padding:8px 15px;border-radius:20px;font-size:14px;font-weight:bold;position:relative;}
+.cart-count{position:absolute;top:-8px;right:-8px;background:#e74c3c;color:white;border-radius:50%;width:20px;height:20px;font-size:11px;display:flex;align-items:center;justify-content:center;}
+.main{display:flex;gap:4px;padding:4px;min-height:500px;}
+.left-section{flex:1;background:linear-gradient(135deg, #f6d365 0%, #fda085 100%);padding:8px;border-radius:4px;display:flex;gap:8px;}
+.right-section{flex:1;background:linear-gradient(135deg, #fda085 0%, #f6d365 100%);padding:8px;border-radius:4px;display:flex;gap:8px;}
+.login-box,.order-box{width:140px;background:white;border-radius:8px;padding:10px;font-size:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1);display:flex;flex-direction:column;gap:6px;}
+.login-box h3,.order-box h3{font-size:11px;color:#d32f2f;margin-bottom:4px;text-align:center;}
+.login-box input{padding:5px;border:1px solid #ddd;border-radius:4px;font-size:10px;}
+.login-box button,.order-box button{background:#27ae60;color:white;border:none;padding:6px;border-radius:4px;font-size:10px;font-weight:bold;}
+.profile-box{background:#e8f5e8;padding:6px;border-radius:4px;font-size:9px;line-height:1.4;}
+.order-box{background:#fffbf0;}
+.cart-items{max-height:120px;overflow-y:auto;font-size:9px;}
+.cart-item{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #eee;}
+.product-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:8px;}
+.product-box{background:white;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.1);padding:8px;display:flex;flex-direction:column;transition:0.3s;position:relative;}
+.product-box:hover{transform:translateY(-3px);box-shadow:0 4px 10px rgba(0,0,0,0.2);}
+.product-img{width:100%;height:70px;background:#f0f0f0;border-radius:4px;margin-bottom:5px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.product-name{font-size:10px;font-weight:bold;margin-bottom:3px;height:24px;overflow:hidden;color:var(--heading-color);}
+.product-price{font-size:11px;color:#27ae60;font-weight:bold;margin-bottom:5px;}
+.product-btns{display:flex;gap:4px;}
+.btn-cart{flex:1;background:#ff9a00;color:white;border:none;padding:4px;border-radius:3px;font-size:9px;font-weight:bold;}
+.btn-wish{background:#fff;border:1px solid #d32f2f;color:#d32f2f;padding:4px 6px;border-radius:3px;font-size:9px;}
+.wishlist-dot{position:absolute;top:5px;right:5px;background:#e74c3c;color:white;width:16px;height:16px;border-radius:50%;font-size:10px;display:none;align-items:center;justify-content:center;}
+.product-box.wished.wishlist-dot{display:flex;}
+.footer{background:var(--footer-bg);color:#d32f2f;padding:15px;display:flex;justify-content:space-between;align-items:center;font-weight:bold;font-size:11px;}
+.footer-center{font-size:24px;}
+.footer button{background:#d32f2f;color:white;border:none;padding:6px 12px;border-radius:4px;font-size:10px;}
+.popup{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;align-items:center;justify-content:center;}
+.popup-content{background:white;padding:20px;border-radius:8px;width:320px;max-width:90%;max-height:80vh;overflow-y:auto;}
+.popup h2{margin-bottom:15px;color:#d32f2f;text-align:center;font-size:16px;}
+.popup input{width:100%;padding:8px;margin:5px 0;border:1px solid #ddd;border-radius:4px;}
+.popup button{background:#d32f2f;color:white;border:none;padding:8px 15px;border-radius:4px;margin-top:10px;}
+.admin-table{width:100%;font-size:10px;border-collapse:collapse;}
+.admin-table th,.admin-table td{border:1px solid #ddd;padding:4px;text-align:left;}
+@media(max-width:768px){
+.header h1{font-size:24px;}
+.main{flex-direction:column;}
+.left-section,.right-section{flex-direction:column;}
+.login-box,.order-box{width:100%;}
+.footer{flex-direction:column;gap:8px;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<div class="header" id="header">
+  <div style="display:flex;align-items:center;">
+    <img id="headerLogo" class="header-logo" src="" alt="Logo">
+    <div>
+      <h1 id="headerTitle">🛒 SANTRA MALL</h1>
+      <div id="headerTagline" class="header-tagline"></div>
+    </div>
+  </div>
+  <div class="cart-icon" onclick="showCart()">🛒 <span id="tabCart">Cart</span> <span class="cart-count" id="cartCount">0</span></div>
+</div>
+
+<div class="main">
+  <div class="left-section">
+    <div class="login-box">
+      <h3>👤 <span id="tabAccount">CUSTOMER LOGIN</span></h3>
+      <div id="loginForm">
+        <input type="text" id="userName" placeholder="Full Name">
+        <input type="text" id="userPhone" placeholder="Phone Number">
+        <input type="text" id="userAddress" placeholder="Address">
+        <button onclick="loginUser()">Login / Register</button>
+      </div>
+      <div id="userProfile" class="profile-box" style="display:none;"></div>
+    </div>
+    <div class="product-grid" id="leftProducts"></div>
+  </div>
+
+  <div class="right-section">
+    <div class="product-grid" id="rightProducts"></div>
+    <div class="order-box">
+      <h3>📦 <span id="tabOrder">MY ORDER</span></h3>
+      <div class="cart-items" id="cartItems">Cart Empty</div>
+      <div style="font-size:11px;font-weight:bold;margin:5px 0;">Total: ₹<span id="cartTotal">0</span></div>
+      <button onclick="placeOrder()">Place Order</button>
+      <button onclick="showWishlist()" style="background:#e74c3c;margin-top:4px;">❤️ Wishlist (<span id="wishCount">0</span>)</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer" id="footer">
+  <div>
+    <div id="footerLine1">📞 Customer Care: 9001654667</div>
+    <div id="footerLine2">📧 manishatak0@gmail.com</div>
+    <div id="footerContact"></div>
+  </div>
+  <div class="footer-center" id="footerCenter">SANTRA MALL</div>
+  <div><button onclick="adminLogin()">⚙️ ADMIN PANEL</button></div>
+</div>
+
+<div class="popup" id="popup">
+  <div class="popup-content" id="popupContent"></div>
+</div>
+
+<script>
+// ===== GLOBAL SETTINGS SE LOAD KARO - ADMIN SE CONTROL =====
+function applyGlobalSettings() {
+  const globalSettings = localStorage.getItem('santra_global');
+  if(globalSettings) {
+    const g = JSON.parse(globalSettings);
+
+    // 1. Font apply karo
+    if(g.fontFamily) document.body.style.fontFamily = g.fontFamily;
+
+    // 2. Colors apply karo
+    document.documentElement.style.setProperty('--heading-color', g.headingColor || '#212121');
+    document.documentElement.style.setProperty('--text-color', g.textColor || '#424242');
+    document.documentElement.style.setProperty('--link-color', g.linkColor || '#e40046');
+    if(g.headerBg) document.getElementById('header').style.background = g.headerBg;
+    if(g.footerBg) document.getElementById('footer').style.background = g.footerBg;
+
+    // 3. Header update karo
+    if(g.headerTitle) {
+      document.getElementById('headerTitle').innerText = g.headerTitle;
+      document.getElementById('pageTitle').innerText = g.headerTitle + ' - Online Shopping';
+    }
+    if(g.headerTagline) document.getElementById('headerTagline').innerText = g.headerTagline;
+    if(g.headerLogo) {
+      document.getElementById('headerLogo').src = g.headerLogo;
+      document.getElementById('headerLogo').style.display = 'inline-block';
+    }
+
+    // 4. Footer update karo
+    if(g.footerLine1) document.getElementById('footerLine1').innerText = g.footerLine1;
+    if(g.footerLine2) document.getElementById('footerLine2').innerText = g.footerLine2;
+    if(g.footerContact) document.getElementById('footerContact').innerText = g.footerContact;
+    if(g.headerTitle) document.getElementById('footerCenter').innerText = g.headerTitle;
+
+    // 5. Tab names update karo
+    if(g.tabCart) document.getElementById('tabCart').innerText = g.tabCart;
+    if(g.tabAccount) document.getElementById('tabAccount').innerText = g.tabAccount;
+    if(g.tabCat) document.getElementById('tabOrder').innerText = g.tabCat;
+
+    // 6. Add to cart button text
+    if(g.addCartBtn) window.globalAddCartText = g.addCartBtn;
+  }
+}
+
+var products=[
+  {id:1,name:"Fresh Oranges 1kg",price:80,img:"🍊"},
+  {id:2,name:"Santra Juice 1L",price:120,img:"🧃"},
+  {id:3,name:"Orange Candy",price:40,img:"🍬"},
+  {id:4,name:"Santra Soap",price:60,img:"🧼"},
+  {id:5,name:"Orange Cake",price:250,img:"🍰"},
+  {id:6,name:"Santra Face Wash",price:150,img:"🧴"},
+  {id:7,name:"Orange Chips",price:50,img:"🍟"},
+  {id:8,name:"Santra Jam",price:90,img:"🍯"},
+  {id:9,name:"Orange T-Shirt",price:399,img:"👕"},
+  {id:10,name:"Santra Perfume",price:299,img:"🌸"},
+  {id:11,name:"Orange Mug",price:199,img:"☕"},
+  {id:12,name:"Santra Basket",price:349,img:"🧺"}
+];
+
+var cart=[],wishlist=[],user=null,allUsers=[],allOrders=[];
+var ADMIN_PASS="santra123";
+
+window.onload=function(){
+  applyGlobalSettings(); // Pehle global settings load karo
+  loadData();
+  loadProducts();
+  updateCart();
+  checkLogin();
+};
+
+function loadData(){
+  allUsers=JSON.parse(localStorage.getItem('santraUsers')||'[]');
+  allOrders=JSON.parse(localStorage.getItem('santraOrders')||'[]');
+  user=JSON.parse(localStorage.getItem('santraCurrentUser')||'null');
+}
+
+function saveData(){
+  localStorage.setItem('santraUsers',JSON.stringify(allUsers));
+  localStorage.setItem('santraOrders',JSON.stringify(allOrders));
+  localStorage.setItem('santraCurrentUser',JSON.stringify(user));
+}
+
+function loadProducts(){
+  var left=document.getElementById('leftProducts');
+  var right=document.getElementById('rightProducts');
+  left.innerHTML='';right.innerHTML='';
+  for(var i=0;i<6;i++){left.innerHTML+=productHTML(products[i]);}
+  for(var i=6;i<12;i++){right.innerHTML+=productHTML(products[i]);}
+}
+
+function productHTML(p){
+  var wished=wishlist.includes(p.id)?'wished':'';
+  var btnText = window.globalAddCartText || 'ADD';
+  return `<div class="product-box ${wished}" id="prod${p.id}">
+    <div class="wishlist-dot">❤️</div>
+    <div class="product-img">${p.img}</div>
+    <div class="product-name">${p.name}</div>
+    <div class="product-price">₹${p.price}</div>
+    <div class="product-btns">
+      <button class="btn-cart" onclick="addToCart(${p.id})">${btnText}</button>
+      <button class="btn-wish" onclick="addToWishlist(${p.id})">❤️</button>
+    </div>
+  </div>`;
+}
+
+function loginUser(){
+  var name=document.getElementById('userName').value.trim();
+  var phone=document.getElementById('userPhone').value.trim();
+  var address=document.getElementById('userAddress').value.trim();
+  if(!name||!phone||!address){alert('Saare field bharo');return;}
+  var existing=allUsers.find(u=>u.phone===phone);
+  if(existing){user=existing;}else{user={id:Date.now(),name:name,phone:phone,address:address,joined:new Date().toLocaleDateString()};allUsers.push(user);}
+  saveData();checkLogin();showPopup('✅ Welcome','Login successful!<br>Welcome '+user.name);
+}
+
+function checkLogin(){
+  if(user){
+    document.getElementById('loginForm').style.display='none';
+    document.getElementById('userProfile').style.display='block';
+    document.getElementById('userProfile').innerHTML=`<b>${user.name}</b><br>📱 ${user.phone}<br>📍 ${user.address}<br><button onclick="logout()" style="margin-top:5px;background:#e74c3c;padding:4px;width:100%;">Logout</button>`;
+  }
+}
+
+function logout(){user=null;saveData();location.reload();}
+function addToCart(id){if(!user){alert('Pehle login karo!');return;}var p=products.find(x=>x.id===id);var item=cart.find(x=>x.id===id);if(item){item.qty++;}else{cart.push({...p,qty:1});}updateCart();}
+function addToWishlist(id){if(wishlist.includes(id)){wishlist=wishlist.filter(x=>x!==id);document.getElementById('prod'+id).classList.remove('wished');}else{wishlist.push(id);document.getElementById('prod'+id).classList.add('wished');}document.getElementById('wishCount').innerText=wishlist.length;}
+function updateCart(){document.getElementById('cartCount').innerText=cart.reduce((a,b)=>a+b.qty,0);var html='',total=0;if(cart.length===0){html='Cart Empty';}else{cart.forEach(item=>{total+=item.price*item.qty;html+=`<div class="cart-item"><span>${item.name} x${item.qty}</span><span>₹${item.price*item.qty}</span></div>`;});}document.getElementById('cartItems').innerHTML=html;document.getElementById('cartTotal').innerText=total;}
+function placeOrder(){if(!user){alert('Pehle login karo!');return;}if(cart.length===0){alert('Cart khali hai!');return;}var order={id:Date.now(),user:user.name,phone:user.phone,address:user.address,items:[...cart],total:document.getElementById('cartTotal').innerText,date:new Date().toLocaleString()};allOrders.push(order);saveData();showPopup('🎉 Order Placed!','Thank you '+user.name+'!<br>Order ID: #'+order.id+'<br>Total: ₹'+order.total+'<br>Jald hi deliver hoga!');cart=[];updateCart();}
+function adminLogin(){var pass=prompt('Enter Admin Password:');if(pass===ADMIN_PASS){showAdminPanel();}else if(pass!==null){alert('Wrong Password!');}}
+function showAdminPanel(){var userHTML='<table class="admin-table"><tr><th>Name</th><th>Phone</th><th>Joined</th></tr>';allUsers.forEach(u=>{userHTML+=`<tr><td>${u.name}</td><td>${u.phone}</td><td>${u.joined}</td></tr>`;});userHTML+='</table>';var orderHTML='<table class="admin-table"><tr><th>Order ID</th><th>Customer</th><th>Total</th><th>Date</th></tr>';allOrders.forEach(o=>{orderHTML+=`<tr><td>#${o.id}</td><td>${o.user}</td><td>₹${o.total}</td><td>${o.date}</td></tr>`;});orderHTML+='</table>';showPopup('⚙️ ADMIN PANEL',`<b>Total Users: ${allUsers.length}</b><br><b>Total Orders: ${allOrders.length}</b><br><br><b>All Customers:</b><br>${userHTML}<br><br><b>All Orders:</b><br>${orderHTML}`);}
+function showPopup(title,msg){document.getElementById('popupContent').innerHTML=`<h2>${title}</h2><div style="font-size:12px;line-height:1.5;">${msg}</div><button onclick="closePopup()">Close</button>`;document.getElementById('popup').style.display='flex';}
+function closePopup(){document.getElementById('popup').style.display='none';}
+function showCart(){if(cart.length===0){showPopup('🛒 Cart','Cart khali hai')}else{showPopup('🛒 Your Cart',document.getElementById('cartItems').innerHTML+`<br><b>Total: ₹${document.getElementById('cartTotal').innerText}</b>`);}}
+function showWishlist(){if(wishlist.length===0){showPopup('❤️ Wishlist','Wishlist khali hai')}else{var items=wishlist.map(id=>products.find(p=>p.id===id).name).join('<br>');showPopup('❤️ Your Wishlist',items);}}
+</script>
+
+</body>
+</html>

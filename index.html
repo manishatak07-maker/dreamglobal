@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SANTRA SHOPPING MALL</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+.hide{display:none!important}
+body{background:#f1f3f6;padding-bottom:70px;color:#212121}
+.header{background:linear-gradient(90deg, #ff9a9e 0%, #fecfef 100%);color:#d32f2f;padding:12px 15px;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.logo{font-size:22px;font-weight:700;color:#d32f2f}
+.header-icons{display:flex;gap:15px;font-size:20px;position:relative;cursor:pointer}
+.cart-count{position:absolute;top:-5px;right:-8px;background:#e40046;color:white;font-size:10px;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.search-bar{display:flex;background:#f1f3f6;border-radius:8px;padding:8px 12px;align-items:center;gap:8px}
+.search-bar input{border:none;background:none;outline:none;width:100%;font-size:14px}
+.banner{margin:8px;border-radius:8px;overflow:hidden}
+.banner img{width:100%!important;height:120px!important;object-fit:cover!important;display:block}
+.section-title{padding:15px;font-size:18px;font-weight:700;background:white;margin:8px 0 0 0}
+.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px}
+.product-card{background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+.product-card img{width:100%!important;height:150px!important;object-fit:cover!important;background:#f0f0f0;}
+.p-info{padding:10px}
+.p-name{font-size:13px;height:35px;overflow:hidden;color:#d32f2f;font-weight:bold;}
+.p-price{font-size:16px;font-weight:700;margin:5px 0;color:#27ae60}
+.p-mrp{font-size:12px;color:#878787;text-decoration:line-through;margin-left:5px}
+.btn-cart{width:100%;background:#ff9a00;color:white;padding:8px;border-radius:4px;font-size:12px;font-weight:bold;border:none;cursor:pointer;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:8px 0;border-top:1px solid #e0e0e0;z-index:100}
+.nav-item{text-align:center;font-size:11px;color:#878787;cursor:pointer}
+.nav-item.active{color:#e40046}
+.page{padding-bottom:70px}
+.cart-item{display:flex;gap:10px;background:white;padding:12px;margin:8px;border-radius:8px}
+.cart-item img{width:80px;height:80px;object-fit:cover;border-radius:6px}
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#f1f3f6}
+.login-box{background:white;padding:25px;border-radius:8px;width:100%;max-width:400px}
+.btn{width:100%;padding:14px;border:none;border-radius:6px;font-size:15px;font-weight:600;background:#e40046;color:white;margin-top:15px;cursor:pointer}
+.input{width:100%;padding:12px;border:1px solid #e0e0e0;border-radius:6px;margin-top:8px;font-size:14px}
+.msg{font-size:13px;margin-top:8px;min-height:20px}.error{color:#ef4444}.success{color:#10b981}
+</style>
+</head>
+<body>
+
+<!-- HOME PAGE - HAMESHA DIKHEGA -->
+<div id="homePage" class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="logo">🛍️ SANTRA</div>
+      <div class="header-icons">
+        <span onclick="openCart()">🛒<span class="cart-count" id="cartCount">0</span></span>
+        <span onclick="alert('Profile coming soon')">👤</span>
+        <span onclick="openAdminLogin()">🔑</span>
+      </div>
+    </div>
+    <div class="search-bar">
+      🔍 <input type="text" placeholder="Saree, Kurti, Mobile dhundo..." id="searchInput" onkeyup="searchProduct()">
+    </div>
+  </div>
+
+  <div class="banner">
+    <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a7b9da?w=600" alt="Sale Banner">
+  </div>
+
+  <div class="section-title">Products For You</div>
+  <div class="product-grid" id="productGrid"></div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active">🏠<br>Home</div>
+    <div class="nav-item" onclick="openCart()">🛒<br>Cart</div>
+    <div class="nav-item" onclick="alert('Orders page coming soon')">📦<br>Orders</div>
+    <div class="nav-item" onclick="alert('Account page coming soon')">👤<br>Account</div>
+  </div>
+</div>
+
+<!-- CART PAGE -->
+<div id="cartPage" class="page hide">
+  <div class="header">
+    <div class="header-top">
+      <span onclick="showHome()" style="font-size:20px;cursor:pointer">←</span>
+      <div style="font-weight:600">My Cart</div>
+      <span></span>
+    </div>
+  </div>
+  <div id="cartContent"></div>
+  <div id="cartTotal" style="text-align:right; margin:20px; padding:15px; background:white; border-radius:8px; display:none;">
+      <h3>Total: ₹<span id="totalAmount">0</span></h3>
+      <a href="otpindex.html" id="checkoutBtn" style="background:#e91e63; color:white; padding:14px 25px; text-decoration:none; border-radius:8px; font-weight:bold; display:block; text-align:center; margin-top:10px;">
+          🛒 Checkout - COD
+      </a>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN PAGE -->
+<div id="loginPage" class="login-page hide">
+  <div class="login-box">
+    <h2 style="text-align:center;color:#e40046;margin-bottom:20px">Admin Login</h2>
+    <input type="email" id="loginEmail" class="input" placeholder="Admin Email">
+    <input type="password" id="loginPass" class="input" placeholder="Password">
+    <div id="loginMsg" class="msg"></div>
+    <button class="btn" onclick="adminLogin()">Login</button>
+    <button class="btn" onclick="showHome()" style="background:#999;margin-top:8px;">Back to Home</button>
+    <button class="btn" onclick="downloadBackup()" style="background:#ff9a00;margin-top:8px;">💾 Download Backup</button>
+    <button class="btn" onclick="document.getElementById('backupFile').click()" style="background:#27ae60;margin-top:8px;">📂 Restore Backup</button>
+    <input type="file" id="backupFile" accept=".json" style="display:none" onchange="handleBackupFile(event)">
+  </div>
+</div>
+
+<script>
+// ===== 1. BACKUP PRODUCTS - OLD DATA KO TOUCH NAHI KAREGA =====
+function checkBackupProducts(){
+    let products = localStorage.getItem('santraProducts');
+    // Sirf tab backup daalo jab bilkul khaali ho ya galat ho
+    if(!products || products === '[]' || products === 'null'){
+        console.log('No old products found, adding 6 backup products');
+        products = [
+            {id:1, name:"Fresh Oranges 1kg", price:80, mrp:100, image:"https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=300"},
+            {id:2, name:"Santra Juice 1L", price:120, mrp:150, image:"https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=300"},
+            {id:3, name:"Orange Candy", price:40, mrp:50, image:"https://images.unsplash.com/photo-1582058091505-f87a463e6cd1?w=300"},
+            {id:4, name:"Santra Soap", price:60, mrp:80, image:"https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=300"},
+            {id:5, name:"Orange Cake", price:250, mrp:300, image:"https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300"},
+            {id:6, name:"Santra Face Wash", price:150, mrp:200, image:"https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300"}
+        ];
+        localStorage.setItem('santraProducts', JSON.stringify(products));
+    } else {
+        console.log('Old products found, keeping them safe');
+    }
+}
+
+// ===== 2. PAGE LOAD =====
+window.onload = function() {
+    checkBackupProducts();
+    loadProductsForCustomer();
+    updateCartCount();
+}
+
+// ===== 3. PRODUCTS DIKHAO =====
+function loadProductsForCustomer() {
+    const products = JSON.parse(localStorage.getItem('santraProducts')) || [];
+    const productContainer = document.getElementById('productGrid');
+    
+    if(products.length === 0) {
+        productContainer.innerHTML = '<p style="text-align:center; padding:20px; grid-column:1/-1;">Abhi koi product nahi hai</p>';
+        return;
+    }
+    
+    let html = '';
+    products.forEach(p => {
+        html += `
+        <div class="product-card">
+            <img src="${p.image || p.thumb || 'https://via.placeholder.com/200x150/e91e63/ffffff?text=SANTRA'}" 
+                 onerror="this.src='https://via.placeholder.com/200x150/e91e63/ffffff?text=No+Image'">
+            <div class="p-info">
+                <div class="p-name">${p.name}</div>
+                <div class="p-price">₹${p.price} ${p.mrp? '<span class="p-mrp">₹'+p.mrp+'</span>' : ''}</div>
+                <button class="btn-cart" onclick="addToCart(${p.id})">Add to Cart</button>
+            </div>
+        </div>
+        `;
+    });
+    productContainer.innerHTML = html;
+}
+
+// ===== 4. ADD TO CART =====
+function addToCart(id){
+    let cart = JSON.parse(localStorage.getItem('santraCart')) || [];
+    let products = JSON.parse(localStorage.getItem('santraProducts')) || [];
+    let product = products.find(p=>p.id===id);
+    if(!product) return;
+    
+    let item = cart.find(c=>c.id===id);
+    if(item){ item.qty++; }
+    else{ cart.push({id:id, name:product.name, price:product.price, image:product.image, qty:1}); }
+    
+    localStorage.setItem('santraCart', JSON.stringify(cart));
+    updateCartCount();
+    alert('✅ Cart me add ho gaya!');
+}
+
+// ===== 5. CART OPEN =====
+function openCart() {
+    document.getElementById('homePage').classList.add('hide');
+    document.getElementById('cartPage').classList.remove('hide');
+    
+    let cart = JSON.parse(localStorage.getItem('santraCart')) || [];
+    let cartContent = document.getElementById('cartContent');
+    let cartTotal = document.getElementById('cartTotal');
+    
+    if(cart.length === 0) {
+        cartContent.innerHTML = '<p style="text-align:center; padding:40px;">Cart khaali hai 😢</p>';
+        cartTotal.style.display = 'none'; 
+        return;
+    }
+    
+    let html = '';
+    let total = 0;
+    cart.forEach(item => {
+        html += `
+            <div class="cart-item">
+                <img src="${item.image || 'https://via.placeholder.com/80'}">
+                <div style="flex:1">
+                    <b>${item.name}</b><br>
+                    <div style="margin-top:8px;">Qty: ${item.qty} × ₹${item.price} = <b>₹${item.price * item.qty}</b></div>
+                </div>
+            </div>
+        `;
+        total += item.price * item.qty;
+    });
+    
+    cartContent.innerHTML = html;
+    document.getElementById('totalAmount').innerText = total;
+    cartTotal.style.display = 'block';
+}
+
+function updateCartCount(){
+    let cart = JSON.parse(localStorage.getItem('santraCart')) || [];
+    let count = cart.reduce((s,c)=>s+c.qty,0);
+    document.getElementById('cartCount').innerText = count;
+}
+
+function showHome(){
+    document.querySelectorAll('.page').forEach(p=>p.classList.add('hide'));
+    document.getElementById('homePage').classList.remove('hide');
+}
+
+function searchProduct(){ loadProductsForCustomer(); }
+
+// ===== 6. ADMIN LOGIN =====
+function openAdminLogin(){
+    document.getElementById('homePage').classList.add('hide');
+    document.getElementById('loginPage').classList.remove('hide');
+}
+
+function adminLogin(){
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPass').value.trim();
+    const msg = document.getElementById('loginMsg');
+    
+    if(email === 'manishatak07@gmail.com' && pass === 'admin123'){
+        localStorage.setItem('SANTRA_USER', JSON.stringify({email:email, name:'Admin', role:'admin'}));
+        alert('Admin Login Success!');
+        window.location.href =        
+        window.location.href = 'admin.html'; // Admin panel ka page
+    }else{
+        msg.innerHTML='❌ Galat Email ya Password';
+        msg.className='msg error';
+    }
+}
+
+// ===== 7. BACKUP / RESTORE =====
+function downloadBackup(){
+    let backup = {
+        products: localStorage.getItem('santraProducts'),
+        cart: localStorage.getItem('santraCart'),
+        users: localStorage.getItem('SANTRA_USER'),
+        orders: localStorage.getItem('santraOrders'),
+        settings: localStorage.getItem('santraData')
+    };
+
+    let blob = new Blob([JSON.stringify(backup, null, 2)], {type: 'application/json'});
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = 'SANTRA_BACKUP_'+Date.now()+'.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    alert('✅ Backup download ho gaya!');
+}
+
+function handleBackupFile(event){
+    const file = event.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e){
+        try{
+            const backup = JSON.parse(e.target.result);
+            if(backup.products) localStorage.setItem('santraProducts', backup.products);
+            if(backup.cart) localStorage.setItem('santraCart', backup.cart);
+            if(backup.users) localStorage.setItem('SANTRA_USER', backup.users);
+            if(backup.orders) localStorage.setItem('santraOrders', backup.orders);
+            if(backup.settings) localStorage.setItem('santraData', backup.settings);
+
+            alert('✅ Backup restore ho gaya! Page reload karo.');
+            location.reload();
+        }catch(err){
+            alert('❌ Backup file galat hai');
+        }
+    };
+    reader.readAsText(file);
+}
+</script>
+
+</body>
+</html>

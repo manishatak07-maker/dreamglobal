@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Drawing Board Pro Max</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;-webkit-tap-highlight-color:transparent;}
+body{background:#fff5f8;overflow:hidden;}
+.top{background:#ff3f6c;color:white;padding:8px;text-align:center;position:fixed;top:0;left:0;right:0;z-index:100;}
+.top button{position:absolute;right:8px;top:6px;background:#4caf50;color:white;border:none;padding:6px 12px;border-radius:6px;font-weight:bold;font-size:12px;}
+.menu{width:100%;background:#ff3f6c;color:white;padding:6px;position:fixed;top:42px;left:0;right:0;z-index:99;display:flex;gap:4px;overflow-x:auto;}
+.menu button{flex-shrink:0;background:white;color:#ff3f6c;border:none;padding:6px 10px;border-radius:6px;font-weight:bold;font-size:10px;white-space:nowrap;}
+.tools{width:100%;background:#333;color:white;padding:6px;position:fixed;top:80px;left:0;right:0;z-index:98;display:flex;gap:4px;overflow-x:auto;align-items:center;}
+.tools button,.tools select,.tools input{flex-shrink:0;background:#555;color:white;border:none;padding:5px 8px;border-radius:4px;font-size:10px;}
+.tools label{font-size:10px;white-space:nowrap;}
+.tools input[type="color"]{width:25px;height:25px;padding:0;}
+.canvas{position:fixed;top:118px;left:0;right:0;bottom:0;background:#fafafa;overflow:auto;}
+.box{position:absolute;background:white;border:2px solid #ff3f6c;cursor:move;touch-action:none;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.box.selected{border-color:#4caf50;border-width:3px;z-index:50;}
+.box.del{position:absolute;top:-10px;right:-10px;background:#f44336;color:white;border:none;width:24px;height:24px;border-radius:50%;font-weight:bold;font-size:14px;z-index:53;}
+.box.rotate{position:absolute;top:-35px;left:50%;margin-left:-12px;width:24px;height:24px;background:#9c27b0;color:white;border:none;border-radius:50%;font-size:14px;z-index:53;}
+.box.handle{position:absolute;width:16px;height:16px;background:#2196F3;border:2px solid white;border-radius:50%;z-index:52;}
+.handle.nw{top:-8px;left:-8px;cursor:nwse-resize;}
+.handle.n{top:-8px;left:50%;margin-left:-8px;cursor:ns-resize;}
+.handle.ne{top:-8px;right:-8px;cursor:nesw-resize;}
+.handle.w{top:50%;left:-8px;margin-top:-8px;cursor:ew-resize;}
+.handle.e{top:50%;right:-8px;margin-top:-8px;cursor:ew-resize;}
+.handle.sw{bottom:-8px;left:-8px;cursor:nesw-resize;}
+.handle.s{bottom:-8px;left:50%;margin-left:-8px;cursor:ns-resize;}
+.handle.se{bottom:-8px;right:-8px;cursor:nwse-resize;}
+.box.content{width:100%;height:100%;overflow:hidden;pointer-events:none;}
+.box.txt{width:100%;height:100%;padding:10px;outline:none;word-wrap:break-word;display:flex;align-items:center;justify-content:center;text-align:center;pointer-events:auto;}
+.box img{width:100%;height:100%;object-fit:cover;pointer-events:none;}
+.shape-circle{border-radius:50%!important;}
+.shape-triangle{clip-path:polygon(50% 0%, 0% 100%, 100% 100%);}
+.shape-arrow{clip-path:polygon(0% 20%, 60% 20%, 60% 0%, 100% 50%, 60% 100%, 60% 80%, 0% 80%);}
+.empty{text-align:center;padding:100px 20px;color:#999;font-size:16px;}
+#drawCanvas{position:absolute;top:0;left:0;pointer-events:none;z-index:40;}
+</style>
+</head>
+<body>
+<div class="top">🎨 DRAWING BOARD PRO <button onclick="saveAll()">💾 SAVE</button></div>
+
+<div class="menu">
+<button onclick="addBox('text')">📝 Text</button>
+<button onclick="addBox('rect')">▭ Box</button>
+<button onclick="addBox('circle')">● Circle</button>
+<button onclick="addBox('triangle')">▲ Triangle</button>
+<button onclick="addBox('arrow')">➡️ Arrow</button>
+<button onclick="addBox('emoji')">😊 Emoji</button>
+<button onclick="document.getElementById('imgUpload').click()">🖼️ Photo</button>
+<input type="file" id="imgUpload" accept="image/*" style="display:none" onchange="addImage(event)">
+<button onclick="loadTpl('flipkart')">🛒 Flipkart</button>
+<button onclick="clearAll()">🗑️ Clear</button>
+</div>
+
+<div class="tools" id="tools">
+<button onclick="toggleDraw()">✏️ <span id="drawTxt">Draw</span></button>
+<button onclick="makeBigger()">🔍 Bada</button>
+<button onclick="makeSmaller()">🔎 Chhota</button>
+<label>BG:<input type="color" id="eBg" value="#ffffff" onchange="updateBox()"></label>
+<label>Border:<input type="color" id="eBorder" value="#ff3f6c" onchange="updateBox()"></label>
+<label>Text:<input type="color" id="eColor" value="#333333" onchange="updateBox()"></label>
+<label>Size:<select id="eSize" onchange="updateBox()"><option value="12">12</option><option value="16" selected>16</option><option value="20">20</option><option value="24">24</option><option value="32">32</option><option value="48">48</option></select></label>
+<button onclick="deleteBox()" style="background:#f44336;">🗑️ Del</button>
+</div>
+
+<div class="canvas" id="canvas">
+<canvas id="drawCanvas"></canvas>
+<div class="empty" id="emptyMsg">👆 Box pe tap karo → 8 dabbe + rotate aayega<br>Drag karke move karo, dabbe se size badlo</div>
+</div>
+
+<script>
+var KEY='santra_final_v5';
+var data=[];
+var selected=null;
+var dragItem=null,offsetX=0,offsetY=0;
+var resizeDir=null,resizeItem=null;
+var rotateItem=null,startAngle=0,startRotate=0;
+var isDrawing=false,drawMode=false;
+var ctx,drawCanvas;
+
+window.onload=function(){
+var p=prompt("Password:");
+if(p!=="chotibehen123"){alert("Galat!");window.location.href='index.html';}
+drawCanvas=document.getElementById('drawCanvas');
+ctx=drawCanvas.getContext('2d');
+resizeCanvas();
+loadData();
+window.addEventListener('resize',resizeCanvas);
+};
+
+function resizeCanvas(){
+drawCanvas.width=window.innerWidth;
+drawCanvas.height=window.innerHeight-118;
+}
+
+function addBox(type){
+var text='Text Likho',shape='',img='';
+if(type==='rect'){text='Box';shape='rect';}
+if(type==='circle'){text='Circle';shape='circle';}
+if(type==='triangle'){text='Triangle';shape='triangle';}
+if(type==='arrow'){text='Arrow';shape='arrow';}
+if(type==='emoji'){text='😊🎉🔥';}
+var box={id:'b'+Date.now(),type:type,text:text,bg:'#ffffff',border:'#ff3f6c',color:'#333',radius:'8',size:'16',shape:shape,img:img,rotate:0,x:30+data.length*15,y:30+data.length*15,w:150,h:100};
+data.push(box);draw();select(box.id);
+}
+
+function addImage(e){
+var file=e.target.files[0];
+if(!file)return;
+var reader=new FileReader();
+reader.onload=function(event){
+var box={id:'b'+Date.now(),type:'image',text:'',bg:'transparent',border:'#ff3f6c',color:'#333',radius:'8',size:'16',shape:'',img:event.target.result,rotate:0,x:30+data.length*15,y:30+data.length*15,w:200,h:200};
+data.push(box);draw();select(box.id);
+};
+reader.readAsDataURL(file);
+e.target.value='';
+}
+
+function draw(){
+var canvas=document.getElementById('canvas');
+var empty=document.getElementById('emptyMsg');
+if(data.length===0){empty.style.display='block';canvas.querySelectorAll('.box').forEach(e=>e.remove());return;}
+empty.style.display='none';
+canvas.querySelectorAll('.box').forEach(e=>e.remove());
+for(var i=0;i<data.length;i++){
+var b=data[i];
+var div=document.createElement('div');
+div.className='box';
+if(b.shape)div.classList.add('shape-'+b.shape);
+div.id=b.id;
+div.style.left=b.x+'px';
+div.style.top=b.y+'px';
+div.style.width=b.w+'px';
+div.style.height=b.h+'px';
+div.style.background=b.bg;
+div.style.borderColor=b.border;
+div.style.borderRadius=b.shape==='circle'?'50%':b.radius+'px';
+div.style.color=b.color;
+div.style.fontSize=b.size+'px';
+div.style.transform='rotate('+b.rotate+'deg)';
+if(b.id===selected){
+div.classList.add('selected');
+var handles='<button class="del" onclick="delBox(event,\''+b.id+'\')">×</button><button class="rotate" onmousedown="startRotate(event,\''+b.id+'\')" ontouchstart="startRotate(event,\''+b.id+'\')">↻</button>';
+['nw','n','ne','w','e','sw','s','se'].forEach(d=>{
+handles+='<div class="handle '+d+'" onmousedown="startResize(event,\''+b.id+'\',\''+d+'\')" ontouchstart="startResize(event,\''+b.id+'\',\''+d+'\')"></div>';
+});
+div.innerHTML=handles;
+}
+var content='';
+if(b.type==='image'&&b.img){
+content='<img src="'+b.img+'">';
+}else{
+content='<div class="txt" contenteditable="true">'+b.text.replace(/\\n/g,'<br>')+'</div>';
+}
+div.innerHTML+=content;
+div.addEventListener('mousedown',function(e){if(e.target.classList.contains('handle')||e.target.classList.contains('rotate')||e.target.classList.contains('del'))return;startDrag(e,this.id);});
+div.addEventListener('touchstart',function(e){if(e.target.classList.contains('handle')||e.target.classList.contains('rotate')||e.target.classList.contains('del'))return;startDrag(e,this.id);});
+canvas.appendChild(div);
+}
+}
+
+function startDrag(e,id){
+if(drawMode)return;
+e.stopPropagation();e.preventDefault();
+select(id);
+var touch=e.touches?e.touches[0]:e;
+dragItem=document.getElementById(id);
+var rect=dragItem.getBoundingClientRect();
+offsetX=touch.clientX-rect.left;
+offsetY=touch.clientY-rect.top;
+document.addEventListener('touchmove',drag,{passive:false});
+document.addEventListener('mousemove',drag);
+document.addEventListener('touchend',endDrag);
+document.addEventListener('mouseup',endDrag);
+}
+
+function drag(e){
+if(!dragItem)return;
+e.preventDefault();
+var touch=e.touches?e.touches[0]:e;
+var x=touch.clientX-offsetX;
+var y=touch.clientY-offsetY-118;
+dragItem.style.left=x+'px';
+dragItem.style.top=y+'px';
+updateData(dragItem.id,{x:x,y:y});
+}
+
+function endDrag(){
+if(dragItem)saveText(dragItem.id);
+dragItem=null;
+document.removeEventListener('touchmove',drag);
+document.removeEventListener('mousemove',drag);
+document.removeEventListener('touchend',endDrag);
+document.removeEventListener('mouseup',endDrag);
+}
+
+function startResize(e,id,dir){
+e.stopPropagation();e.preventDefault();
+resizeItem=id;resizeDir=dir;
+document.addEventListener('touchmove',doResize,{passive:false});
+document.addEventListener('mousemove',doResize);
+document.addEventListener('touchend',endResize);
+document.addEventListener('mouseup',endResize);
+}
+
+function doResize(e){
+if(!resizeItem)return;
+e.preventDefault();
+var touch=e.touches?e.touches[0]:e;
+var box=document.getElementById(resizeItem);
+var b=box.getBoundingClientRect();
+var d=getData(resizeItem);
+var nx=d.x,ny=d.y,nw=d.w,nh=d.h;
+if(resizeDir.includes('e'))nw=touch.clientX-b.left;
+if(resizeDir.includes('w')){nw=b.right-touch.clientX;nx=touch.clientX;}
+if(resizeDir.includes('s'))nh=touch.clientY-b.top-118;
+if(resizeDir.includes('n')){nh=b.bottom-touch.clientY+118;ny=touch.clientY-118;}
+if(nw>40&&nh>40){
+box.style.width=nw+'px';box.style.height=nh+'px';
+box.style.left=nx+'px';box.style.top=ny+'px';
+updateData(resizeItem,{x:nx,y:ny,w:nw,h:nh});
+}
+}
+
+function endResize(){
+resizeItem=null;resizeDir=null;
+document.removeEventListener('touchmove',doResize);
+document.removeEventListener('mousemove',doResize);
+document.removeEventListener('touchend',endResize);
+document.removeEventListener('mouseup',endResize);
+}
+
+function startRotate(e,id){
+e.stopPropagation();e.preventDefault();
+rotateItem=id;
+var box=document.getElementById(id);
+var rect=box.getBoundingClientRect();
+var cx=rect.left+rect.width/2;
+var cy=rect.top+rect.height/2;
+var touch=e.touches?e.touches[0]:e;
+startAngle=Math.atan2(touch.clientY-cy,touch.clientX-cx)*180/Math.PI;
+startRotate=getData(id).rotate||0;
+document.addEventListener('touchmove',doRotate,{passive:false});
+document.addEventListener('mousemove',doRotate);
+document.addEventListener('touchend',endRotate);
+document.addEventListener('mouseup',endRotate);
+}
+
+function doRotate(e){
+if(!rotateItem)return;
+e.preventDefault();
+var box=document.getElementById(rotateItem);
+var rect=box.getBoundingClientRect();
+var cx=rect.left+rect.width/2;
+var cy=rect.top+rect.height/2;
+var touch=e.touches?e.touches[0]:e;
+var angle=Math.atan2(touch.clientY-cy,touch.clientX-cx)*180/Math.PI;
+var rot=startRotate+(angle-startAngle);
+box.style.transform='rotate('+rot+'deg)';
+updateData(rotateItem,{rotate:rot});
+}
+
+function endRotate(){
+rotateItem=null;
+document.removeEventListener('touchmove',doRotate);
+document.removeEventListener('mousemove',doRotate);
+document.removeEventListener('touchend',endRotate);
+document.removeEventListener('mouseup',endRotate);
+}
+
+function select(id){
+selected=id;
+draw();
+var box=getData(id);
+if(box){
+document.getElementById('eBg').value=box.bg;
+document.getElementById('eBorder').value=box.border;
+document.getElementById('eColor').value=box.color;
+document.getElementById('eSize').value=box.size;
+}
+}
+
+function updateBox(){
+if(!selected)return;
+updateData(selected,{
+bg:document.getElementById('eBg').value,
+border:document.getElementById('eBorder').value,
+color:document.getElementById('eColor').value,
+size:document.getElementById('eSize').value
+});
+draw();select(selected);
+}
+
+function makeBigger(){
+if(!selected){alert('Pehle box select kar');return;}
+var d=getData(selected);
+updateData(selected,{w:d.w+30,h:d.h+20});
+draw();select(selected);
+}
+
+function makeSmaller(){
+if(!selected){alert('Pehle box select kar');return;}
+var d=getData(selected);
+if(d.w>60&&d.h>50)updateData(selected,{w:d.w-30,h:d.h-20});
+draw();select(selected);
+}
+
+function delBox(e,id){
+e.stopPropagation();
+data=data.filter(function(b){return b.id!==id;});
+if(selected===id)selected=null;
+draw();
+}
+
+function deleteBox(){
+if(!selected){alert('Pehle box select kar');return;}
+delBox({stopPropagation:function(){}},selected);
+}
+
+function getData(id){
+for(var i=0;i<data.length;i++){if(data[i].id===id)return data[i];}
+}
+
+function updateData(id,obj){
+for(var i=0;i<data.length;i++){if(data[i].id===id){for(var k in obj)data[i][k]=obj[k];break;}}
+}
+
+function saveText(id){
+var el=document.getElementById(id);
+if(el){var txt=el.querySelector('.txt');if(txt)updateData(id,{text:txt.innerText});}
+}
+
+function toggleDraw(){
+drawMode=!drawMode;
+document.getElementById('drawTxt').innerText=drawMode?'Stop':'Draw';
+drawCanvas.style.pointerEvents=drawMode?'auto':'none';
+if(drawMode){
+drawCanvas.addEventListener('touchstart',startDraw);
+drawCanvas.addEventListener('touchmove',drawing);
+drawCanvas.addEventListener('touchend',stopDraw);
+drawCanvas.addEventListener('mousedown',startDraw);
+drawCanvas.addEventListener('mousemove',drawing);
+drawCanvas.addEventListener('mouseup',stopDraw);
+}
+}
+
+function startDraw(e){isDrawing=true;var p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.strokeStyle='#ff3f6c';ctx.lineWidth=3;}
+function drawing(e){if(!isDrawing)return;var p=getPos(e);ctx.lineTo(p.x,p.y);ctx.stroke();}
+function stopDraw(){isDrawing=false;}
+function getPos(e){var r=drawCanvas.getBoundingClientRect();var t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top};}
+
+function loadTpl(name){
+if(!confirm('Purane boxes hat jayenge!'))return;
+data=[];
+if(name==='flipkart'){
+data=[
+{id:'t1',type:'rect',text:'FLIPKART SALE 70% OFF',bg:'#2874f0',border:'#2874f0',color:'#fff',radius:'8',size:'20',shape:'rect',rotate:0,x:20,y:20,w:320,h:80},
+{id:'t2',type:'rect',text:'Mobile\\n₹7,999',bg:'#fff',border:'#2874f0',color:'#333',radius:'8',size:'16',shape:'rect',rotate:0,x:20,y:120,w:150,h:100}
+];
+}
+draw();
+}
+
+function clearAll(){
+if(!confirm('Sab delete?'))return;
+data=[];
+ctx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+draw();
+}
+
+function loadData(){
+var saved=JSON.parse(localStorage.getItem(KEY))||[];
+data=saved;
+draw();
+}
+
+function saveAll(){
+document.querySelectorAll('.box').forEach(el=>saveText(el.id));
+localStorage.setItem(KEY,JSON.stringify(data));
+alert('✅ Save Ho Gaya!\\n\\nAb index.html khol ke dekh');
+window.open('index.html','_blank');
+}
+</script>
+</body>
+</html>

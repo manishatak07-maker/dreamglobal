@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Verify - SANTRA MALL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .box {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .box h2 { color: #e91e63; margin-bottom: 10px; }
+        .box p { color: #666; font-size: 14px; margin-bottom: 20px; }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-green { background: #25d366; color: white; }
+        .btn-pink { background: #e91e63; color: white; }
+        #step2, #step3 { display: none; }
+        .order-summary {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .order-item { 
+            display:flex; 
+            justify-content:space-between; 
+            margin:6px 0; 
+            font-size:13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <!-- Step 1: Phone Number -->
+        <div id="step1">
+            <h2>🛒 Order Verify Karo</h2>
+            <p>Order confirm karne ke liye WhatsApp OTP verify karein</p>
+            
+            <div class="order-summary" id="cartSummary">
+                <b>Loading order...</b>
+            </div>
+            
+            <input type="tel" id="customerPhone" placeholder="WhatsApp Number - 10 digit" maxlength="10">
+            <button class="btn-green" onclick="sendOrderOTP()">
+                📱 WhatsApp pe OTP Bhejo
+            </button>
+        </div>
+
+        <!-- Step 2: OTP Daalo -->
+        <div id="step2">
+            <h2>🔑 OTP Daalo</h2>
+            <p>WhatsApp check karo, OTP bhej diya hai</p>
+            <input type="number" id="enteredOTP" placeholder="6 Digit OTP" maxlength="6">
+            <button class="btn-pink" onclick="verifyOrderOTP()">
+                OTP Verify Karo
+            </button>
+            <button onclick="goBack()" style="background:#999; margin-top:5px;">← Wapas</button>
+        </div>
+
+        <!-- Step 3: Address Bharo -->
+        <div id="step3">
+            <h2>📦 Delivery Details</h2>
+            <p>OTP Verified ✅ Ab address bharo</p>
+            <input type="text" id="customerName" placeholder="Pura Naam *" required>
+            <textarea id="customerAddress" placeholder="Full Address + Pincode *" rows="3" required></textarea>
+            <button class="btn-pink" onclick="placeFinalOrder()">
+                Order Place Karo - COD
+            </button>
+        </div>
+    </div>
+    <script>
+const ADMIN_WHATSAPP = "919001654667"; // Tera WhatsApp number
+let generatedOTP = '';
+let customerMobile = '';
+
+// Page load hote hi cart dikhao - Acode + Live dono mein chalega
+window.onload = function() {
+    let cartData = localStorage.getItem('santraCart');
+    let summary = document.getElementById('cartSummary');
+    
+    if(!cartData || cartData === 'null' || cartData === '[]') {
+        summary.innerHTML = '<b>Cart khaali hai!</b><br><a href="index.html" style="color:#e91e63;">Shopping karo</a>';
+        document.getElementById('customerPhone').style.display = 'none';
+        document.querySelector('.btn-green').style.display = 'none';
+        return;
+    }
+    
+    let cart = JSON.parse(cartData);
+    let html = '<b>Your Order:</b><br><br>';
+    let total = 0;
+    
+    cart.forEach(item => {
+        html += `
+            <div class="order-item">
+                <span>${item.name} x ${item.qty}</span>
+                <span><b>₹${item.price * item.qty}</b></span>
+            </div>
+        `;
+        total += item.price * item.qty;
+    });
+    
+    html += `<hr style="margin:10px 0;"><div class="order-item"><b>Total</b><b>₹${total}</b></div>`;
+    summary.innerHTML = html;
+}
+
+// STEP 1: WhatsApp pe OTP bhejo - WEBSITE OTP BANAYEGI
+function sendOrderOTP(){
+    let mobile = document.getElementById('customerPhone').value.trim();
+    
+    // Mobile check karo
+    if(mobile.length !== 10 || isNaN(mobile)){
+        alert('Sahi 10 digit mobile number daalo');
+        return;
+    }
+    
+    // Cart check karo
+    let cart = JSON.parse(localStorage.getItem('santraCart') || '[]');
+    if(cart.length === 0){
+        alert('Pehle cart mein product add karo');
+        return;
+    }
+    
+    customerMobile = mobile;
+    generatedOTP = Math.floor(100000 + Math.random() * 900000); // 👈 WEBSITE OTP BANAYEGI
+    
+    // WhatsApp message - Customer khud ko bhejega
+    let msg = `*SANTRA MALL*\n\nOrder Verification OTP: *${generatedOTP}*\n\nYe OTP kisi ko mat batana. 5 min mein expire ho jayega.\n\nWebsite pe wapas jaake ye OTP daal do.`;
+    let waLink = `https://wa.me/91${mobile}?text=${encodeURIComponent(msg)}`;
+    
+    window.open(waLink, '_blank'); // WhatsApp khul jayega
+    
+    // Step 2 dikhao
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+}
+
+// STEP 2: OTP Verify karo
+function verifyOrderOTP(){
+    let entered = document.getElementById('enteredOTP').value.trim();
+    
+    if(entered === generatedOTP.toString()){
+        alert('OTP Verified ✅');
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step3').style.display = 'block';
+    } else {
+        alert('❌ Galat OTP! WhatsApp check karo');
+    }
+}
+
+// STEP 3: Final Order Place + Admin ko WhatsApp
+function placeFinalOrder(){
+    let name = document.getElementById('customerName').value.trim();
+    let address = document.getElementById('customerAddress').value.trim();
+    
+    if(!name || !address){
+        alert('Naam aur Address dono bharna zaroori hai');
+        return;
+    }
+    
+    let cart = JSON.parse(localStorage.getItem('santraCart') || '[]');
+    let total = 0;
+    let itemsText = '';
+    
+    cart.forEach(item => {
+        itemsText += `\n- ${item.name} x ${item.qty} = ₹${item.price * item.qty}`;
+        total += item.price * item.qty;
+    });
+    
+    // Admin ko WhatsApp pe order bhejo
+    let orderMsg = `🛒 *NEW ORDER - SANTRA MALL*\n\n` +
+                   `👤 *Customer:* ${name}\n` +
+                   `📱 *Mobile:* ${customerMobile}\n` +
+                   `📍 *Address:* ${address}\n\n` +
+                   `📦 *Items:* ${itemsText}\n\n` +
+                   `💰 *Total: ₹${total}* - COD\n\n` +
+                   `Order ID: #${Date.now()}`;
+    
+    let adminLink = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(orderMsg)}`;
+    window.open(adminLink, '_blank');
+    
+    // Order save karo localStorage mein - Admin dashboard ke liye
+    let orders = JSON.parse(localStorage.getItem('santraOrders')) || [];
+    orders.push({
+        id: Date.now(),
+        name: name,
+        mobile: customerMobile,
+        address: address,
+        items: cart,
+        total: total,
+        date: new Date().toLocaleString('en-IN'),
+        status: 'New'
+    });
+    localStorage.setItem('santraOrders', JSON.stringify(orders));
+    
+    // Cart khaali kar do
+    localStorage.removeItem('santraCart');
+    
+    alert('✅ Order Place ho gaya! Admin se call aayega.');
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 2000);
+}
+
+function goBack(){
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step1').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
+    

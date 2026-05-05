@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - Santra Mall</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
+        body { background: #f5f5; }
+        .header { background: #e91e63; color: white; padding: 15px; font-size: 20px; font-weight: bold; }
+        .container { padding: 20px; max-width: 1200px; margin: auto; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .card { padding: 25px; border-radius: 10px; color: white; }
+        .blue { background: #6366f1; }
+        .green { background: #10b981; }
+        .orange { background: #f59e0b; }
+        .pink { background: #ec4899; }
+        .card h2 { font-size: 35px; margin-bottom: 5px; }
+        .orders-box { background: white; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        .status { background: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">🛡️ SANTRA MALL - Dashboard</div>
+    <div class="container">
+        <h1>Dashboard</h1>
+        <p style="margin: 10px 0; padding: 10px; background: #e0f2fe; border-left: 4px solid #0284c7; border-radius: 5px;">
+            📊 <b>Dashboard:</b> Yahan se poori website ka overview dekho. Total products, orders, customers aur revenue ek nazar me.
+        </p>
+        
+        <div class="stats">
+            <div class="card blue">
+                <h2 id="totalProducts">5</h2>
+                <p>Total Products</p>
+            </div>
+            <div class="card green">
+                <h2 id="totalOrders">2</h2>
+                <p>Total Orders</p>
+            </div>
+            <div class="card orange">
+                <h2 id="totalCustomers">0</h2>
+                <p>Total Customers</p>
+            </div>
+            <div class="card pink">
+                <h2>₹<span id="totalRevenue">2500</span></h2>
+                <p>Total Revenue</p>
+            </div>
+        </div>
+
+        <div class="orders-box">
+            <h3>🔥 Recent Orders</h3>
+            <table>
+                <tr>
+                    <th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th>
+                </tr>
+                <tr>
+                    <td>#1777041532318</td><td>santosh</td><td>₹500</td><td><span class="status">Placed</span></td><td>24/4/2026</td>
+                </tr>
+                <tr>
+                    <td>#1777040788200</td><td>Nita</td><td>₹2000</td><td><span class="status">Placed</span></td><td>24/4/2026</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

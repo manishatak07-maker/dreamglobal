@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SANTRA MALL - Admin Panel</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#f5f5f5;}
+button{cursor:pointer;}
+.hide{display:none !important;}
+.login-screen{display:flex;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg, #f6d365 0%, #fda085 100%);}
+.login-box{background:white;padding:30px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.2);width:350px;text-align:center;}
+.login-box h1{color:#d32f2f;margin-bottom:20px;font-size:28px;}
+.login-box input{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:6px;font-size:14px;}
+.login-box button{width:100%;background:#d32f2f;color:white;border:none;padding:12px;border-radius:6px;font-size:16px;font-weight:bold;margin-top:10px;}
+.admin-wrap{display:flex;height:100vh;background:#f5f5f5;}
+.admin-sidebar{width:220px;background:#1e293b;color:white;padding:15px 0;}
+.admin-sidebar h2{padding:0 15px 15px 15px;font-size:18px;border-bottom:1px solid #334155;}
+.admin-menu{list-style:none;}
+.admin-menu li{padding:12px 15px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:10px;}
+.admin-menu li:hover,.admin-menu li.active{background:#334155;}
+.admin-main{flex:1;padding:20px;overflow-y:auto;}
+.admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.admin-header h1{font-size:24px;color:#1e293b;}
+.admin-card{background:white;padding:20px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:15px;}
+.admin-card h2{font-size:18px;color:#1e293b;margin-bottom:15px;border-bottom:2px solid #e40046;padding-bottom:8px;}
+.admin-card h3{font-size:16px;color:#334155;margin-top:20px;margin-bottom:10px;}
+.input{width:100%;padding:8px;margin:5px 0;border:1px solid #ddd;border-radius:4px;font-size:14px;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+label{font-size:13px;font-weight:600;color:#475569;display:block;margin-top:10px;}
+small{font-size:11px;color:#64748b;}
+.btn-save{background:linear-gradient(135deg, #28a745, #20c997);color:white;border:none;padding:12px;border-radius:6px;cursor:pointer;width:100%;font-weight:bold;font-size:15px;margin-top:15px;}
+.btn-save:hover{opacity:0.9;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <h1>🛒 SANTRA MALL</h1>
+    <h3 style="color:#475569;margin-bottom:15px;">Admin Login</h3>
+    <input type="text" id="adminUser" placeholder="Username">
+    <input type="password" id="adminPass" placeholder="Password">
+    <button onclick="adminLogin()">Login to Dashboard</button>
+  </div>
+</div>
+
+<div id="adminPanel" class="admin-wrap hide">
+  <div class="admin-sidebar">
+    <h2>⚙️ ADMIN PANEL</h2>
+    <ul class="admin-menu">
+      <li onclick="showTab('dashboard',this)" class="active">📊 Dashboard</li>
+      <li onclick="showTab('categories',this)">📦 Categories</li>
+      <li onclick="showTab('orders',this)">🛍️ Orders</li>
+      <li onclick="showTab('customers',this)">👥 Customers</li>
+      <li onclick="showTab('payment',this)">💳 Payment</li>
+      <li onclick="showTab('settings',this)">⚙️ Theme Settings</li>
+      <li onclick="showTab('global',this)">🌐 Global Control</li>
+      <li onclick="showTab('password',this)">🔑 Change Password</li>
+      <li onclick="window.open('index-global.html','_blank')">🏠 View Website</li>
+      <li onclick="adminLogout()">🚪 Logout</li>
+    </ul>
+  </div>
+
+  <div class="admin-main">
+    <div class="admin-header">
+      <h1 id="tabTitle">Dashboard</h1>
+      <div style="font-size:14px;color:#64748b;">Welcome, Admin</div>
+    </div>
+
+    <!-- DASHBOARD TAB -->
+    <div id="dashboard" class="tab-content active">
+      <div class="admin-card">
+        <h2>📊 Dashboard Overview</h2>
+        <div class="grid-3">
+          <div style="background:#e0f2fe;padding:15px;border-radius:6px;text-align:center;">
+            <div style="font-size:32px;font-weight:bold;color:#0284c7;" id="totalUsers">0</div>
+            <div style="font-size:13px;color:#475569;margin-top:5px;">Total Users</div>
+          </div>
+          <div style="background:#dcfce7;padding:15px;border-radius:6px;text-align:center;">
+            <div style="font-size:32px;font-weight:bold;color:#16a34a;" id="totalOrders">0</div>
+            <div style="font-size:13px;color:#475569;margin-top:5px;">Total Orders</div>
+          </div>
+          <div style="background:#fef3c7;padding:15px;border-radius:6px;text-align:center;">
+            <div style="font-size:32px;font-weight:bold;color:#d97706;" id="totalRevenue">₹0</div>
+            <div style="font-size:13px;color:#475569;margin-top:5px;">Revenue</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORIES TAB -->
+    <div id="categories" class="tab-content">
+      <div class="admin-card">
+        <h2>📦 Categories Management</h2>
+        <p style="color:#64748b;">Yaha categories add/edit karo</p>
+      </div>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div id="orders" class="tab-content">
+      <div class="admin-card">
+        <h2>🛍️ Orders Management</h2>
+        <div id="ordersList"></div>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS TAB -->
+    <div id="customers" class="tab-content">
+      <div class="admin-card">
+        <h2>👥 Customers List</h2>
+        <div id="customersList"></div>
+      </div>
+    </div>
+
+    <!-- PAYMENT TAB -->
+    <div id="payment" class="tab-content">
+      <div class="admin-card">
+        <h2>💳 Payment Settings</h2>
+        <h3>Account Box Settings</h3>
+        <div><label>Title</label><input type="text" id="setPhonePeTitle" class="input" value="PhonePe"></div>
+        <div><label>Subtitle</label><input type="text" id="setPhonePeSubtitle" class="input" value="UPI / QR"></div>
+        <div><label>Text</label><input type="text" id="setPhonePeText" class="input" value="Free 24*7"></div>
+        <div><label>Button</label><input type="text" id="setPhonePeButton" class="input" value="Pay Now"></div>
+        <button type="button" onclick="saveAccountBox()" class="btn-save">💾 Save Account Box</button>
+      </div>
+    </div>
+
+    <!-- THEME SETTINGS TAB -->
+    <div id="settings" class="tab-content">
+      <div class="admin-card">
+        <h2>⚙️ Theme Settings</h2>
+        <div><label>Primary Color</label><input type="color" id="setPrimaryColor" class="input" value="#e40046"></div>
+        <div><label>Background Color</label><input type="color" id="setBgColor" class="input" value="#ffffff"></div>
+        <div><label>Text Color</label><input type="color" id="setTextColor" class="input" value="#212121"></div>
+        <button type="button" onclick="saveTheme()" class="btn-save">💾 Save Theme</button>
+      </div>
+    </div>
+
+    <!-- GLOBAL CONTROL TAB - NEW -->
+    <div id="global" class="tab-content">
+      <div class="admin-card">
+        <h2>🌐 Website Global Control Panel</h2>
+        <p style="color:#64748b;margin-bottom:15px;">Yaha se poori website ka text, font, color, image sab change hoga</p>
+        
+        <h3>📝 Font & Text Settings</h3>
+        
+        <h3 style="margin-top: 25px; border-bottom: 2px solid #e40046; padding-bottom: 5px;">🖼️ Background & Colors</h3>
+<div><label>Main Background Color</label><input type="color" id="g_mainBgColor" value="#fff8f0" class="input"></div>
+<div><label>Main Container Background Color</label><input type="color" id="g_containerBgColor" value="#fda085" class="input"></div>
+<div><label>Background Image URL</label><input type="text" id="g_bgImage" class="input" placeholder="https://... ya gallery se upload karo"></div>
+<div><label>Background Image Upload</label><input type="file" id="g_bgImageFile" class="input" accept="image/*" onchange="uploadBgImage(this)"></div>
+<div><img id="bgPreview" style="max-width:200px;margin-top:5px;display:none;border:1px solid #ddd;border-radius:4px;"></div>
+
+<div class="grid-3" style="margin-top:15px;">
+  <div><label>Product Name Color</label><input type="color" id="g_productNameColor" value="#212121" class="input"></div>
+  <div><label>Price Color</label><input type="color" id="g_priceColor" value="#27ae60" class="input"></div>
+  <div><label>Button Text Color</label><input type="color" id="g_btnTextColor" value="#ffffff" class="input"></div>
+</div>
+<div class="grid-2" style="margin-top:10px;">
+  <div><label>ADD Button Color</label><input type="color" id="g_addBtnColor" value="#ff9a00" class="input"></div>
+  <div><label>Place Order Button Color</label><input type="color" id="g_orderBtnColor" value="#27ae60" class="input"></div>
+</div>
+        <div><label>Website Font Family</label>
+          <select id="g_fontFamily" class="input">
+            <option value="'Roboto', sans-serif">Roboto - Modern</option>
+            <option value="'Poppins', sans-serif">Poppins - Stylish</option>
+            <option value="'Montserrat', sans-serif">Montserrat - Bold</option>
+            <option value="'Hind', sans-serif">Hind - Hindi Best</option>
+            <option value="'Noto Sans', sans-serif">Noto Sans - Universal</option>
+          </select>
+        </div>
+        <div class="grid-3">
+          <div><label>Heading Color</label><input type="color" id="g_headingColor" value="#212121" class="input"></div>
+          <div><label>Text Color</label><input type="color" id="g_textColor" value="#424242" class="input"></div>
+          <div><label>Link Color</label><input type="color" id="g_linkColor" value="#e40046" class="input"></div>
+        </div>
+
+        <h3>🔝 Header Control</h3>
+        <div><label>Website Name/Logo Text</label><input type="text" id="g_headerTitle" class="input" placeholder="SANTRA MALL"></div>
+        <div><label>Header Tagline</label><input type="text" id="g_headerTagline" class="input" placeholder="Best Online Shopping"></div>
+        <div><label>Header Logo Image URL</label><input type="text" id="g_headerLogo" class="input" placeholder="https://..."></div>
+        <div><label>Header Background Color</label><input type="color" id="g_headerBg" value="#e40046" class="input"></div>
+
+        <h3>🔻 Footer Control</h3>
+        <div><label>Footer Line 1</label><input type="text" id="g_footerLine1" class="input" placeholder="© 2026 SANTRA MALL"></div>
+        <div><label>Footer Line 2</label><input type="text" id="g_footerLine2" class="input" placeholder="All Rights Reserved"></div>
+        <div><label>Footer Contact/Address</label><input type="text" id="g_footerContact" class="input" placeholder="Contact: +91 XXXXX"></div>
+        <div><label>Footer Background Color</label><input type="color" id="g_footerBg" value="#212121" class="input"></div>
+
+        <h3>📦 Tab & Box Names</h3>
+        <div class="grid-2">
+          <div><label>Home Tab</label><input type="text" id="g_tabHome" class="input" value="Home"></div>
+          <div><label>Categories Tab</label><input type="text" id="g_tabCat" class="input" value="Categories"></div>
+          <div><label>Cart Tab</label><input type="text" id="g_tabCart" class="input" value="Cart"></div>
+          <div><label>Account Tab</label><input type="text" id="g_tabAccount" class="input" value="Account"></div>
+        </div>
+        <div><label>Search Box Text</label><input type="text" id="g_searchText" class="input" value="Search products..."></div>
+        <div><label>Add to Cart Button Text</label><input type="text" id="g_addCartBtn" class="input" value="Add to Cart"></div>
+
+        <button type="button" onclick="saveGlobalControl()" class="btn-save">💾 SAVE ALL WEBSITE SETTINGS</button>
+      </div>
+    </div>
+
+    <!-- PASSWORD TAB -->
+    <div id="password" class="tab-content">
+      <div class="admin-card">
+        <h2>🔑 Change Password</h2>
+        <div><label>Current Password</label><input type="password" id="oldPass" class="input"></div>
+        <div><label>New Password</label><input type="password" id="newPass" class="input"></div>
+        <div><label>Confirm Password</label><input type="password" id="confirmPass" class="input"></div>
+        <button type="button" onclick="changePassword()" class="btn-save">🔐 Update Password</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var ADMIN_USER = "admin";
+var ADMIN_PASS = localStorage.getItem('santra_admin_pass') || "santra123";
+
+function adminLogin() {
+  var user = document.getElementById('adminUser').value;
+  var pass = document.getElementById('adminPass').value;
+  if(user === ADMIN_USER && pass === ADMIN_PASS) {
+    document.getElementById('loginScreen').classList.add('hide');
+    document.getElementById('adminPanel').classList.remove('hide');
+    loadDashboard();
+    loadGlobalControl();
+  } else {
+    alert('❌ Wrong Username or Password!');
+  }
+}
+
+function adminLogout() {
+  document.getElementById('adminPanel').classList.add('hide');
+  document.getElementById('loginScreen').classList.remove('hide');
+  document.getElementById('adminUser').value = '';
+  document.getElementById('adminPass').value = '';
+}
+
+function showTab(tabName, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.admin-menu li').forEach(li => li.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('tabTitle').innerText = el.innerText.replace(/[^\w\s]/gi, '').trim();
+}
+
+function loadDashboard() {
+  var users = JSON.parse(localStorage.getItem('santraUsers')||'[]');
+  var orders = JSON.parse(localStorage.getItem('santraOrders')||'[]');
+  var revenue = orders.reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
+  document.getElementById('totalUsers').innerText = users.length;
+  document.getElementById('totalOrders').innerText = orders.length;
+  document.getElementById('totalRevenue').innerText = '₹' + revenue.toFixed(0);
+}
+
+// ===== ACCOUNT BOX FUNCTIONS =====
+function saveAccountBox() {
+  const accountData = {
+    title: document.getElementById('setPhonePeTitle').value,
+    subtitle: document.getElementById('setPhonePeSubtitle').value,
+    text: document.getElementById('setPhonePeText').value,
+    button: document.getElementById('setPhonePeButton').value
+  };
+  localStorage.setItem('santra_accountBox', JSON.stringify(accountData));
+  alert('✅ Account Box Saved!');
+}
+
+// ===== THEME FUNCTIONS =====
+function saveTheme() {
+  const themeData = {
+    primaryColor: document.getElementById('setPrimaryColor').value,
+    bgColor: document.getElementById('setBgColor').value,
+    textColor: document.getElementById('setTextColor').value
+  };
+  localStorage.setItem('santra_theme', JSON.stringify(themeData));
+  alert('✅ Theme Saved!');
+}
+
+// ===== GLOBAL CONTROL FUNCTIONS =====
+function saveGlobalControl() {
+  const globalData = {
+    fontFamily: document.getElementById('g_fontFamily').value,
+    headingColor: document.getElementById('g_headingColor').value,
+    textColor: document.getElementById('g_textColor').value,
+    linkColor: document.getElementById('g_linkColor').value,
+    headerTitle: document.getElementById('g_headerTitle').value,
+    headerTagline: document.getElementById('g_headerTagline').value,
+    headerLogo: document.getElementById('g_headerLogo').value,
+    headerBg: document.getElementById('g_headerBg').value,
+    footerLine1: document.getElementById('g_footerLine1').value,
+    footerLine2: document.getElementById('g_footerLine2').value,
+    footerContact: document.getElementById('g_footerContact').value,
+    footerBg: document.getElementById('g_footerBg').value,
+    tabHome: document.getElementById('g_tabHome').value,
+    tabCat: document.getElementById('g_tabCat').value,
+    tabCart: document.getElementById('g_tabCart').value,
+    tabAccount: document.getElementById('g_tabAccount').value,
+    searchText: document.getElementById('g_searchText').value,
+    addCartBtn: document.getElementById('g_addCartBtn').value
+  };
+  localStorage.setItem('santra_global', JSON.stringify(globalData));
+  alert('✅ All Website Settings Saved!\nAb index-global.html refresh karo');
+}
+
+function loadGlobalControl() {
+  const saved = localStorage.getItem('santra_global');
+  if(saved) {
+    const d = JSON.parse(saved);
+    document.getElementById('g_fontFamily').value = d.fontFamily || "'Roboto', sans-serif";
+    document.getElementById('g_headingColor').value = d.headingColor || '#212121';
+    document.getElementById('g_textColor').value = d.textColor || '#424242';
+    document.getElementById('g_linkColor').value = d.linkColor || '#e40046';
+    document.getElementById('g_headerTitle').value = d.headerTitle || 'SANTRA MALL';
+    document.getElementById('g_headerTagline').value = d.headerTagline || '';
+    document.getElementById('g_headerLogo').value = d.headerLogo || '';
+    document.getElementById('g_headerBg').value = d.headerBg || '#e40046';
+    document.getElementById('g_footerLine1').value = d.footerLine1 || '© 2026 SANTRA MALL';
+    document.getElementById('g_footerLine2').value = d.footerLine2 || '';
+    document.getElementById('g_footerContact').value = d.footerContact || '';
+    document.getElementById('g_footerBg').value = d.footerBg || '#212121';
+    document.getElementById('g_tabHome').value = d.tabHome || 'Home';
+    document.getElementById('g_tabCat').value = d.tabCat || 'Categories';
+    document.getElementById('g_tabCart').value = d.tabCart || 'Cart';
+    document.getElementById('g_tabAccount').value = d.tabAccount || 'Account';
+    document.getElementById('g_searchText').value = d.searchText || 'Search products...';
+    document.getElementById('g_addCartBtn').value = d.addCartBtn || 'Add to Cart';
+  }
+}
+
+function changePassword() {
+  var oldPass = document.getElementById('oldPass').value;
+  var newPass = document.getElementById('newPass').value;
+  var confirmPass = document.getElementById('confirmPass').value;
+  
+  if(oldPass !== ADMIN_PASS) {
+    alert('❌ Current password galat hai!');
+    return;
+  }
+  if(newPass !== confirmPass) {
+    alert('❌ New password match nahi kar raha!');
+    return;
+  }
+  if(newPass.length < 6) {
+    alert('❌ Password kam se kam 6 characters ka hona chahiye!');
+    return;
+  }
+  
+  localStorage.setItem('santra_admin_pass', newPass);
+  ADMIN_PASS = newPass;
+  alert('✅ Password successfully change ho gaya!');
+  document.getElementById('oldPass').value = '';
+  document.getElementById('newPass').value = '';
+  document.getElementById('confirmPass').value = '';
+}
+
+function uploadBgImage(input) {
+  const file = input.files[0];
+  if(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const imageUrl = e.target.result;
+      document.getElementById('g_bgImage').value = imageUrl;
+      document.getElementById('bgPreview').src = imageUrl;
+      document.getElementById('bgPreview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+// saveGlobalControl function ko update kar - ye lines add kar:
+function saveGlobalControl() {
+  const globalData = {
+    fontFamily: document.getElementById('g_fontFamily').value,
+    headingColor: document.getElementById('g_headingColor').value,
+    textColor: document.getElementById('g_textColor').value,
+    linkColor: document.getElementById('g_linkColor').value,
+    headerTitle: document.getElementById('g_headerTitle').value,
+    headerTagline: document.getElementById('g_headerTagline').value,
+    headerLogo: document.getElementById('g_headerLogo').value,
+    headerBg: document.getElementById('g_headerBg').value,
+    footerLine1: document.getElementById('g_footerLine1').value,
+    footerLine2: document.getElementById('g_footerLine2').value,
+    footerContact: document.getElementById('g_footerContact').value,
+    footerBg: document.getElementById('g_footerBg').value,
+    tabHome: document.getElementById('g_tabHome').value,
+    tabCat: document.getElementById('g_tabCat').value,
+    tabCart: document.getElementById('g_tabCart').value,
+    tabAccount: document.getElementById('g_tabAccount').value,
+    searchText: document.getElementById('g_searchText').value,
+    addCartBtn: document.getElementById('g_addCartBtn').value,
+    // NEW FIELDS
+    mainBgColor: document.getElementById('g_mainBgColor').value,
+    containerBgColor: document.getElementById('g_containerBgColor').value,
+    bgImage: document.getElementById('g_bgImage').value,
+    productNameColor: document.getElementById('g_productNameColor').value,
+    priceColor: document.getElementById('g_priceColor').value,
+    btnTextColor: document.getElementById('g_btnTextColor').value,
+    addBtnColor: document.getElementById('g_addBtnColor').value,
+    orderBtnColor: document.getElementById('g_orderBtnColor').value
+  };
+  localStorage.setItem('santra_global', JSON.stringify(globalData));
+  alert('✅ All Website Settings Saved!\nAb index.html refresh karo');
+}
+
+// loadGlobalControl me bhi ye add kar:
+function loadGlobalControl() {
+  const saved = localStorage.getItem('santra_global');
+  if(saved) {
+    const d = JSON.parse(saved);
+    // purane fields...
+    if(d.mainBgColor) document.getElementById('g_mainBgColor').value = d.mainBgColor;
+    if(d.containerBgColor) document.getElementById('g_containerBgColor').value = d.containerBgColor;
+    if(d.bgImage) {
+      document.getElementById('g_bgImage').value = d.bgImage;
+      document.getElementById('bgPreview').src = d.bgImage;
+      document.getElementById('bgPreview').style.display = 'block';
+    }
+    if(d.productNameColor) document.getElementById('g_productNameColor').value = d.productNameColor;
+    if(d.priceColor) document.getElementById('g_priceColor').value = d.priceColor;
+    if(d.btnTextColor) document.getElementById('g_btnTextColor').value = d.btnTextColor;
+    if(d.addBtnColor) document.getElementById('g_addBtnColor').value = d.addBtnColor;
+    if(d.orderBtnColor) document.getElementById('g_orderBtnColor').value = d.orderBtnColor;
+  }
+}
+
+</script>
+
+</body>
+</html>

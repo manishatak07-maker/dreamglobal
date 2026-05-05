@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Santra Mall - Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #f5f5f5; }
+        .header { background: #e91e63; color: white; padding: 15px 20px; font-size: 20px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .tabs { background: white; display: flex; border-bottom: 2px solid #ddd; overflow-x: auto; }
+        .tab-btn { padding: 15px 25px; border: none; background: none; cursor: pointer; font-size: 16px; font-weight: bold; color: #666; border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: #e91e63; border-bottom: 3px solid #e91e63; }
+        .container { padding: 20px; max-width: 1200px; margin: auto; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .card { padding: 25px; border-radius: 10px; color: white; }
+        .blue { background: #6366f1; }
+        .green { background: #10b981; }
+        .orange { background: #f59e0b; }
+        .pink { background: #ec4899; }
+        .card h2 { font-size: 35px; margin-bottom: 5px; }
+        .box { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; color: white; font-weight: bold; }
+        .btn-blue { background: #3b82f6; }
+        .btn-green { background: #10b981; }
+        .btn-red { background: #ef4444; }
+        .btn-orange { background: #f59e0b; }
+        .btn-gmail { background: #db4437; }
+        .btn-whatsapp { background: #25d366; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        @media(max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; font-size: 14px; }
+        th { background: #f8f9fa; }
+        .status { background: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+        img { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
+        textarea.sql { height: 120px; background: #1e293b; color: #10b981; font-family: monospace; }
+        .result { background: #1e293b; color: #10b981; padding: 15px; border-radius: 5px; min-height: 100px; font-family: monospace; white-space: pre-wrap; }
+        .login-box { max-width: 400px; margin: 50px auto; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span>🛡️ SANTRA MALL - Admin Panel</span>
+        <span style="font-size: 14px;">Admin: 9001654677</span>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('dashboard')">📊 Dashboard</button>
+        <button class="tab-btn" onclick="openTab('products')">📦 Products</button>
+        <button class="tab-btn" onclick="openTab('sql')">🗄️ SQL Database</button>
+        <button class="tab-btn" onclick="openTab('otp')">🔐 OTP Login</button>
+        <button class="tab-btn" onclick="openTab('otphistory')">📋 OTP History</button>
+    </div>
+
+    <div class="container">
+        <!-- TAB 1: DASHBOARD -->
+        <div id="dashboard" class="tab-content active">
+            <h1>Dashboard</h1>
+            <p style="margin: 10px 0; padding: 10px; background: #e0f2fe; border-left: 4px solid #0284c7; border-radius: 5px;">
+                📊 <b>Dashboard:</b> Yahan se poori website ka overview dekho
+            </p>
+            <div class="stats">
+                <div class="card blue"><h2>5</h2><p>Total Products</p></div>
+                <div class="card green"><h2>2</h2><p>Total Orders</p></div>
+                <div class="card orange"><h2>0</h2><p>Total Customers</p></div>
+                <div class="card pink"><h2>₹2500</h2><p>Total Revenue</p></div>
+            </div>
+            <div class="box">
+                <h3>🔥 Recent Orders</h3>
+                <table>
+                    <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr>
+                    <tr><td>#1777041532318</td><td>santosh</td><td>₹500</td><td><span class="status">Placed</span></td><td>24/4/2026</td></tr>
+                    <tr><td>#1777040788200</td><td>Nita</td><td>₹2000</td><td><span class="status">Placed</span></td><td>24/4/2026</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 2: PRODUCTS -->
+        <div id="products" class="tab-content">
+            <div class="box">
+                <h2>📦 Manage Products</h2>
+                <button class="btn btn-green" onclick="toggleForm()">+ Add New Product</button>
+                <button class="btn btn-blue">📥 Export CSV</button>
+                <div id="productForm" style="display:none; margin-top:20px; padding-top:20px; border-top:2px solid #eee;">
+                    <h3>Add New Product</h3>
+                    <div class="grid">
+                        <input type="text" id="pName" placeholder="Product Name">
+                        <input type="number" id="pPrice" placeholder="Selling Price ₹">
+                        <input type="number" id="pMrp" placeholder="MRP ₹">
+                        <input type="number" id="pStock" placeholder="Stock">
+                    </div>
+                    <div class="grid">
+                        <select id="pCat"><option>Fashion</option><option>Electronics</option><option>Food</option><option>Home</option></select>
+                        <select id="pType"><option value="image">🖼️ Image</option><option value="video">🎬 Video</option><option value="audio">🎵 Audio</option><option value="pdf">📄 PDF</option></select>
+                    </div>
+                    <h4 style="margin-top:15px;">📎 Media Upload</h4>
+                    <input type="text" id="pThumb" placeholder="Thumbnail Image URL">
+                    <input type="text" id="pMedia" placeholder="Media URL (Video/Audio/PDF Link)">
+                    <input type="file" id="pFile">
+                    <textarea id="pDesc" placeholder="Product Description" rows="4"></textarea>
+                    <button class="btn btn-green" onclick="saveProduct()">💾 Save Product</button>
+                    <button class="btn btn-red" onclick="toggleForm()">❌ Cancel</button>
+                </div>
+                <table id="productTable">
+                    <tr><th>ID</th><th>Image</th><th>Name</th><th>Type</th><th>Price</th><th>Stock</th><th>Actions</th></tr>
+                    <tr><td>1777039660163</td><td><img src="https://via.placeholder.com/50/ff69b4/ffffff?text=Cake" alt="cake"></td><td>Cake</td><td>🖼️ image</td><td>₹700</td><td>500</td><td><button class="btn btn-blue">✏️</button> <button class="btn btn-red">🗑️</button></td></tr>
+                    <tr><td>1777059654945</td><td><img src="https://via.placeholder.com/50/9370db/ffffff?text=Dress" alt="dress"></td><td>Dress</td><td>🖼️ image</td><td>₹500</td><td>1000</td><td><button class="btn btn-blue">✏️</button> <button class="btn btn-red">🗑️</button></td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 3: SQL DATABASE -->
+        <div id="sql" class="tab-content">
+            <div class="box">
+                <h2>🗄️ SQL Database Manager</h2>
+                <button class="btn btn-blue" onclick="showTable('products')">📦 Products</button>
+                <button class="btn btn-blue" onclick="showTable('orders')">📋 Orders</button>
+                <button class="btn btn-blue" onclick="showTable('users')">👥 Users</button>
+            </div>
+            <div class="box">
+                <h3>🔍 SQL Query Console</h3>
+                <textarea class="sql" id="query">SELECT * FROM products</textarea>
+                <button class="btn btn-green" onclick="runQuery()">▶ Execute Query</button>
+                <button class="btn btn-red" onclick="clearQuery()">🗑️ Clear</button>
+                <h3 style="margin-top: 20px;">📊 Query Result</h3>
+                <div class="result" id="result">Welcome to SANTRA SQL Console</div>
+            </div>
+            <div class="box">
+                <h3>💾 Database Backup/Restore</h3>
+                <button class="btn btn-blue" onclick="alert('Backup downloaded!')">📥 Download Backup</button>
+                <button class="btn btn-orange" onclick="alert('Restore feature coming soon')">📤 Restore Backup</button>
+                <button class="btn btn-red" onclick="if(confirm('Reset all data?')) alert('Data reset!')">🗑️ Reset All Data</button>
+            </div>
+        </div>
+
+        <!-- TAB 4: OTP LOGIN - CUSTOMER KE LIYE -->
+        <div id="otp" class="tab-content">
+            <div class="box login-box">
+                <h2 style="text-align:center;">🔐 Customer OTP Login</h2>
+                <p style="text-align:center; color:#666; margin:10px 0;">Mobile + Gmail se login karo - FREE</p>
+                
+                <input type="text" id="customerPhone" placeholder="Mobile Number (10 digit)">
+                <input type="email" id="customerEmail" placeholder="Gmail ID">
+                
+                <button class="btn btn-gmail" style="width:100%;" onclick="sendGmailOTP()">
+                    📧 Gmail pe OTP Bhejo - FREE
+                </button>
+                
+                <button class="btn btn-whatsapp" style="width:100%;" onclick="sendWhatsAppOTP()">
+                    💬 WhatsApp pe OTP Lo - FREE
+                </button>
+                
+                <input type="text" id="otpInput" placeholder="6 Digit OTP daalo yahan" maxlength="6">
+                <button class="btn" style="background:#e91e63; width:100%;" onclick="verifyOTP()">
+                    ✅ Verify OTP & Login
+                </button>
+                
+                <p style="font-size:12px; color:#999; text-align:center; margin-top:15px;">
+                    OTP 5 minute mein expire ho jayega
+                </p>
+            </div>
+        </div>
+
+        <!-- TAB 5: OTP HISTORY - TERE LIYE -->
+        <div id="otphistory" class="tab-content">
+            <div class="box">
+                <h2>📋 OTP History - Sab Record Yahan Save Hai</h2>
+                <button class="btn btn-blue" onclick="loadOTPHistory()">🔄 Refresh</button>
+                <button class="btn btn-red" onclick="clearOTPHistory()">🗑️ Clear All History</button>
+                <table id="otpTable">
+                    <tr><th>Time</th><th>Mobile</th><th>Gmail</th><th>OTP</th><th>Type</th><th>Status</th></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script>
+        let currentOTP = "";
+        let otpData = JSON.parse(localStorage.getItem('santraOTPs')) || [];
+
+        // Tab Switching
+        function openTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            if(tabName === 'otphistory') loadOTPHistory();
+        }
+
+        // Products
+        function toggleForm() {
+            const form = document.getElementById('productForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+        function saveProduct() {
+            const name = document.getElementById('pName').value;
+            const price = document.getElementById('pPrice').value;
+            if (!name || !price) {
+                alert('Name aur Price dalna zaroori hai!');
+                return;
+            }
+            alert('Product saved! ✅\n\nNote: Demo hai, real database connect karna padega');
+            toggleForm();
+        }
+
+        // SQL
+        function runQuery() {
+            const query = document.getElementById('query').value.toLowerCase();
+            let result = 'Query executed!\n\n';
+            if (query.includes('products')) {
+                result += '[Demo Data]\nID: 1777039660163 | Name: Cake | Price: 700\nID: 1777059654945 | Name: Dress | Price: 500';
+            } else if (query.includes('orders')) {
+                result += '[Demo Data]\nID: 1777041532318 | Customer: santosh | Amount: 500';
+            } else {
+                result += 'No data found in demo';
+            }
+            document.getElementById('result').innerText = result;
+        }
+        function clearQuery() {
+            document.getElementById('query').value = '';
+            document.getElementById('result').innerText = 'Welcome to SANTRA SQL Console';
+        }
+        function showTable(table) {
+            document.getElementById('query').value = 'SELECT * FROM ' + table;
+            runQuery();
+        }
+
+        // OTP SYSTEM
+        function sendGmailOTP() {
+            const email = document.getElementById('customerEmail').value;
+            const phone = document.getElementById('customerPhone').value;
+            if (!email || !phone || phone.length !== 10) {
+                alert('Sahi Mobile (10 digit) aur Gmail daalo!');
+                return;
+            }
+            currentOTP = Math.floor(100000 + Math.random() * 900000);
+            
+            // YAHAN APNA SECURETOKEN DAALNA - smtpjs.com se banega
+            Email.send({
+                SecureToken: "REPLACE-WITH-YOUR-TOKEN",
+                To: email,
+                From: "santra.mall.official@gmail.com",
+                Subject: "SANTRA MALL Login OTP",
+                Body: `Namaste! 🍊<br><br>Apka SANTRA MALL ka OTP hai: <h2>${currentOTP}</h2><br>Ye 5 minute mein expire ho jayega.<br><br>Team SANTRA MALL`
+            }).then(message => {
+                alert('OTP Gmail pe bhej diya! ✅ Check karo');
+                saveOTPRecord(phone, email, currentOTP, 'Gmail');
+            }).catch(err => {
+                alert('Gmail setup nahi hua! SecureToken check karo');
+            });
+        }
+
+        function sendWhatsAppOTP() {
+            const phone = document.getElementById('customerPhone').value;
+            if (!phone || phone.length !== 10) {
+                alert('10 digit mobile number daalo!');
+                return;
+            }
+            currentOTP = Math.floor(100000 + Math.random() * 900000);
+            const msg = `SANTRA MALL Login OTP: ${currentOTP}\nYe 5 min mein expire hoga.`;
+            const waLink = `https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`;
+            window.open(waLink, '_blank');
+            alert('WhatsApp khul gaya! OTP copy karke yahan daal do ✅');
+            saveOTPRecord(phone, 'WhatsApp User', currentOTP, 'WhatsApp');
+        }
+
+        function verifyOTP() {
+            const enteredOTP = document.getElementById('otpInput').value;
+            if (enteredOTP == currentOTP && currentOTP !== "") {
+                alert('Login Success! 🎉 Welcome to SANTRA MALL');
+                currentOTP = "";
+                document.getElementById('otpInput').value = "";
+            } else {
+                alert('Galat OTP! ❌ Phir se try karo');
+            }
+        }
+
+        function saveOTPRecord(phone, email, otp, type) {
+            const record = {
+                id: Date.now(),
+                phone: phone,
+                email: email,
+                otp: otp,
+                type: type,
+                time: new Date().toLocaleString('en-IN'),
+                status: 'Sent'
+            };
+            otpData.push(record);
+            localStorage.setItem('santraOTPs', JSON.stringify(otpData));
+        }
+
+        function loadOTPHistory() {
+            const table = document.getElementById('otpTable');
+            table.innerHTML = '<tr><th>Time</th><th>Mobile</th><th>Gmail</th><th>OTP</th><th>Type</th><th>Status</th></tr>';
+            otpData.slice().reverse().forEach(record => {
+                table.innerHTML += `<tr><td>${record.time}</td><td>${record.phone}</td><td>${record.email}</td><td><b>${record.otp}</b></td><td>${record.type}</td><td><span class="status">${record.status}</span></td></tr>`;
+            });
+        }
+
+        function clearOTPHistory() {
+            if(confirm('Saara OTP history delete ho jayega! Sure ho?')) {
+                otpData = [];
+                localStorage.setItem('santraOTPs', JSON.stringify(otpData));
+                loadOTPHistory();
+            }
+        }
+    </script>
+</body>
+</html>

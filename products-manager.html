@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Products - Santra Mall</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
+        body { background: #f5f5f5; }
+        .header { background: #e91e63; color: white; padding: 15px; font-size: 20px; font-weight: bold; }
+        .container { padding: 20px; max-width: 1200px; margin: auto; }
+        .box { background: white; padding: 20px; border-radius: 10px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; color: white; font-weight: bold; }
+        .green { background: #10b981; }
+        .blue { background: #3b82f6; }
+        .red { background: #ef4444; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+        img { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">🛡️ SANTRA MALL - Products</div>
+    <div class="container">
+        <div class="box">
+            <h2>📦 Manage Products</h2>
+            <button class="btn green">+ Add New Product</button>
+            <button class="btn blue">📥 Export CSV</button>
+
+            <h3 style="margin-top: 20px;">Add New Product</h3>
+            <div class="grid">
+                <input type="text" placeholder="Product Name">
+                <input type="number" placeholder="Selling Price ₹">
+                <input type="number" placeholder="MRP ₹">
+                <input type="number" placeholder="Stock">
+            </div>
+            
+            <div class="grid">
+                <select>
+                    <option>Fashion</option>
+                    <option>Electronics</option>
+                    <option>Food</option>
+                </select>
+                <select>
+                    <option>🖼️ Image</option>
+                    <option>🎬 Video</option>
+                    <option>🎵 Audio</option>
+                    <option>📄 Document/PDF</option>
+                </select>
+            </div>
+
+            <h4 style="margin-top: 15px;">📎 Media Upload</h4>
+            <input type="text" placeholder="Thumbnail Image URL">
+            <input type="text" placeholder="Media URL (Video/Audio/PDF Link)">
+            
+            <p style="margin: 10px 0;">📱 Upload from Gallery/Browser:</p>
+            <input type="file">
+            
+            <textarea placeholder="Product Description" rows="4"></textarea>
+            
+            <button class="btn green">💾 Save Product</button>
+            <button class="btn red">❌ Cancel</button>
+
+            <table>
+                <tr>
+                    <th>ID</th><th>Image</th><th>Name</th><th>Type</th><th>Price</th><th>Stock</th><th>Actions</th>
+                </tr>
+                <tr>
+                    <td>1777039660163</td>
+                    <td><img src="https://via.placeholder.com/50" alt="cake"></td>
+                    <td>Cake</td>
+                    <td>🖼️ image</td>
+                    <td>₹700</td>
+                    <td>500</td>
+                    <td>
+                        <button class="btn blue">✏️</button>
+                        <button class="btn red">🗑️</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>1777059654945</td>
+                    <td><img src="https://via.placeholder.com/50" alt="dress"></td>
+                    <td>Dress</td>
+                    <td>🖼️ image</td>
+                    <td>₹500</td>
+                    <td>1000</td>
+                    <td>
+                        <button class="btn blue">✏️</button>
+                        <button class="btn red">🗑️</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
